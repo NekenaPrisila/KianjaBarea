@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $nom
  * @property int|null $nombre_disponible
  * 
+ * @property Collection|AccessoiresRecuOccationnel[] $accessoires_recu_occationnels
  * @property Collection|Reservation[] $reservations
  * @property Collection|TarifsAccessoire[] $tarifs_accessoires
  *
@@ -34,6 +35,11 @@ class Accessoire extends Model
 		'nom',
 		'nombre_disponible'
 	];
+
+	public function accessoires_recu_occationnels()
+	{
+		return $this->hasMany(AccessoiresRecuOccationnel::class, 'id_accessoire');
+	}
 
 	public function reservations()
 	{

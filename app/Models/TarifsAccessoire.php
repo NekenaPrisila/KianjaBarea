@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * 
  * @property UniteTarif $unite_tarif
  * @property Accessoire $accessoire
+ * @property Collection|AccessoiresRecuOccationnel[] $accessoires_recu_occationnels
  * @property Collection|AccessoiresReservation[] $accessoires_reservations
  *
  * @package App\Models
@@ -52,6 +53,11 @@ class TarifsAccessoire extends Model
 	public function accessoire()
 	{
 		return $this->belongsTo(Accessoire::class, 'id_accessoire');
+	}
+
+	public function accessoires_recu_occationnels()
+	{
+		return $this->hasMany(AccessoiresRecuOccationnel::class, 'id_tarif');
 	}
 
 	public function accessoires_reservations()

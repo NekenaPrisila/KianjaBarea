@@ -97,7 +97,7 @@ class Reservation extends Model
 
 	public function etatPaiement()
 	{
-		return $this->hasOne(VueEtatPaiement::class, 'id', 'id'); // 'id' = clé primaire de Reservation
+		return $this->hasOne(VueEtatPaiement::class, 'id', 'id');
 	}
 
 	public function getSommeReductions()

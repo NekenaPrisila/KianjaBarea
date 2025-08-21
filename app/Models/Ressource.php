@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id_type_ressource
  * 
  * @property TypeRessource $type_ressource
+ * @property Collection|RecuOccasionnel[] $recu_occasionnels
  * @property Collection|Reservation[] $reservations
  * @property Collection|TarifsRessource[] $tarifs_ressources
  *
@@ -45,6 +46,12 @@ class Ressource extends Model
 	public function type_ressource()
 	{
 		return $this->belongsTo(TypeRessource::class, 'id_type_ressource');
+	}
+
+	public function recu_occasionnels()
+	{
+		return $this->belongsToMany(RecuOccasionnel::class, 'ressources_recu_occasionnel', 'id_ressource', 'id_recu')
+					->withPivot('id_tarif', 'quantite', 'debut_utilisation', 'fin_utilisation');
 	}
 
 	public function reservations()

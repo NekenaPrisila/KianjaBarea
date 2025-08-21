@@ -15,8 +15,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string $reference
  * @property Carbon $date_edition
+ * @property string $reference_paiement
  * @property int $id_mode_paiement
- * @property string|null $reference_paiement
  * @property int $id_facture
  * @property string $reference_facture
  * @property int $creer_par
@@ -41,8 +41,8 @@ class Recu extends Model
 
 	protected $fillable = [
 		'date_edition',
-		'id_mode_paiement',
 		'reference_paiement',
+		'id_mode_paiement',
 		'id_facture',
 		'reference_facture',
 		'creer_par'

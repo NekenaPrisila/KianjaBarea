@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * 
  * @property UniteTarif $unite_tarif
  * @property Ressource $ressource
+ * @property Collection|RessourcesRecuOccasionnel[] $ressources_recu_occasionnels
  * @property Collection|RessourcesReservation[] $ressources_reservations
  *
  * @package App\Models
@@ -52,6 +53,11 @@ class TarifsRessource extends Model
 	public function ressource()
 	{
 		return $this->belongsTo(Ressource::class, 'id_ressource');
+	}
+
+	public function ressources_recu_occasionnels()
+	{
+		return $this->hasMany(RessourcesRecuOccasionnel::class, 'id_tarif');
 	}
 
 	public function ressources_reservations()
