@@ -76,22 +76,15 @@ class RessourceController extends Controller
         // Mettre à jour / Créer les tarifs
         $idsConserves = [];
         foreach ($validated['tarifs'] ?? [] as $tarifData) {
-            if (!empty($tarifData['id'])) {
-                $tarif = TarifsRessource::find($tarifData['id']);
-                $tarif->update($tarifData);
-                $idsConserves[] = $tarif->id;
-            } else {
-                $tarif = $ressource->tarifs_ressources()->create([
-                    'prix_unitaire' => $tarifData['prix_unitaire'],
-                    'id_unite_tarif' => $tarifData['id_unite_tarif'],
-                    'date_saisie' => now(),
-                ]);
-                $idsConserves[] = $tarif->id;
-            }
-        }
+            // Peu importe s'il y a un id ou pas, on crée un nouveau tarif
+            $tarif = $ressource->tarifs_ressources()->create([
+                'prix_unitaire' => $tarifData['prix_unitaire'],
+                'id_unite_tarif' => $tarifData['id_unite_tarif'],
+                'date_saisie' => now(),
+            ]);
 
-        // Supprimer les anciens tarifs non présents dans la requête
-        $ressource->tarifs_ressources()->whereNotIn('id', $idsConserves)->delete();
+            $idsConserves[] = $tarif->id;
+        }
 
         return redirect()->route('ressources.index')->with('success', 'Ressource mise à jour avec ses tarifs !');
     }

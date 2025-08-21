@@ -46,6 +46,13 @@ CREATE TABLE type_client(
    UNIQUE(nom)
 );
 
+CREATE TABLE recu_occasionnel(
+   id INT AUTO_INCREMENT,
+   date_edition DATETIME,
+   motif TEXT NOT NULL,
+   PRIMARY KEY(id)
+);
+
 CREATE TABLE ressources(
    id INT AUTO_INCREMENT,
    nom VARCHAR(50)  NOT NULL,
@@ -121,15 +128,14 @@ CREATE TABLE reservations(
    FOREIGN KEY(id_client, reference_client) REFERENCES clients(id, reference)
 );
 
-CREATE TABLE reductions (
-   id INT AUTO_INCREMENT PRIMARY KEY,
-   motif VARCHAR(50),
-   valeur DECIMAL(5,2) NOT NULL,
+CREATE TABLE reductions(
+   id INT AUTO_INCREMENT,
+   motif VARCHAR(50) ,
+   valeur DECIMAL(3,2)  ,
    id_reservation INT NOT NULL,
-   reference_reservation VARCHAR(50) NOT NULL,
-   CONSTRAINT chk_valeur_reduction CHECK (valeur >= 0 AND valeur <= 100),
-   FOREIGN KEY (id_reservation, reference_reservation) 
-       REFERENCES reservations(id, reference)
+   reference_reservation VARCHAR(50)  NOT NULL,
+   PRIMARY KEY(id),
+   FOREIGN KEY(id_reservation, reference_reservation) REFERENCES reservations(id, reference)
 );
 
 CREATE TABLE facture(
@@ -152,6 +158,7 @@ CREATE TABLE recus(
    id INT AUTO_INCREMENT,
    reference VARCHAR(50) ,
    date_edition DATETIME NOT NULL,
+   reference_paiement VARCHAR(100)  NOT NULL,
    id_mode_paiement INT NOT NULL,
    id_facture INT NOT NULL,
    reference_facture VARCHAR(50)  NOT NULL,
@@ -189,4 +196,17 @@ CREATE TABLE accessoires_reservation(
    FOREIGN KEY(id_reservation, reference_reservation) REFERENCES reservations(id, reference),
    FOREIGN KEY(id_accessoire) REFERENCES accessoires(id),
    FOREIGN KEY(id_tarif_accessoire) REFERENCES tarifs_accessoires(id)
+);
+
+CREATE TABLE ressources_recu_occasionnel(
+   id INT,
+   id_1 INT,
+   id_2 INT,
+   quantite VARCHAR(50) ,
+   debut_utilisation VARCHAR(50) ,
+   fin_utilisation VARCHAR(50) ,
+   PRIMARY KEY(id, id_1, id_2),
+   FOREIGN KEY(id) REFERENCES ressources(id),
+   FOREIGN KEY(id_1) REFERENCES tarifs_ressources(id),
+   FOREIGN KEY(id_2) REFERENCES recu_occasionnel(id)
 );
