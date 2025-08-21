@@ -49,35 +49,20 @@ class CalendarController extends Controller
         }
 
         // Récupérer toutes les ressources pour le calendrier
-        $resources = Ressource::all()->map(function($ressource) {
+        $resources = Ressource::with('type_ressource')->get()->map(function($ressource) {
             return [
                 'id' => $ressource->id,
                 'title' => $ressource->nom,
                 'capacite' => $ressource->capacite,
-                'type' => $ressource->type_ressource->nom // Supposant une relation vers TypeRessource
+                'group' => $ressource->type_ressource ? $ressource->type_ressource->nom : 'Autres' // 👈 ici
             ];
         })->toArray();
+
 
         return view('calendar', [
             'events' => $events,
             'resources' => $resources
         ]);
-    }
-
-    private function getEventClass($reservation)
-    {
-        switch ($reservation->status) {
-            case 'en_attente': return 'bg-warning';
-            case 'confirmee': 
-                return $reservation->status_paiement === 'totalite' 
-                    ? 'bg-success' 
-                    : ($reservation->status_paiement === 'accompte' 
-                        ? 'bg-info' 
-                        : 'bg-reserved');
-            case 'annulee': return 'bg-danger';
-            case 'terminee': return 'bg-secondary';
-            default: return 'bg-reserved';
-        }
     }
 
     /**
