@@ -63,5 +63,4 @@ class RessourcesReservation extends Model
 	{
 		return $this->belongsTo(Ressource::class, 'id_ressource');
 	}
-
 }

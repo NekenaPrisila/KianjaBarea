@@ -104,5 +104,4 @@ class Reservation extends Model
 	{
 		return $this->reductions->sum('valeur');
 	}
-
 }
