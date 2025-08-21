@@ -56,198 +56,170 @@ CREATE TABLE recu_occasionnel(
 CREATE TABLE ressources(
    id INT AUTO_INCREMENT,
    nom VARCHAR(50)  NOT NULL,
-   caution DECIMAL(15,2),
+   caution DECIMAL(15,2)  ,
    capacite INT,
    id_type_ressource INT NOT NULL,
    PRIMARY KEY(id),
    UNIQUE(nom),
-   FOREIGN KEY(id_type_ressource) REFERENCES type_ressource(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE
+   FOREIGN KEY(id_type_ressource) REFERENCES type_ressource(id)
 );
 
 CREATE TABLE clients(
    id INT AUTO_INCREMENT,
-   reference VARCHAR(50),
+   reference VARCHAR(50) ,
    nom VARCHAR(50)  NOT NULL,
    representant VARCHAR(50)  NOT NULL,
    telephone VARCHAR(50)  NOT NULL,
-   email VARCHAR(50),
-   adresse VARCHAR(50),
+   email VARCHAR(50) ,
+   adresse VARCHAR(50) ,
    date_ajout DATETIME NOT NULL,
    id_type_client INT NOT NULL,
    PRIMARY KEY(id, reference),
-   FOREIGN KEY(id_type_client) REFERENCES type_client(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE
+   FOREIGN KEY(id_type_client) REFERENCES type_client(id)
 );
 
 CREATE TABLE utilisateur(
    id INT AUTO_INCREMENT,
    nom_utilisateur VARCHAR(50)  NOT NULL,
    password VARCHAR(255)  NOT NULL,
-   token VARCHAR(50),
+   token VARCHAR(50) ,
    id_role INT NOT NULL,
    PRIMARY KEY(id),
    UNIQUE(nom_utilisateur),
    UNIQUE(token),
-   FOREIGN KEY(id_role) REFERENCES role_utilisateur(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE
+   FOREIGN KEY(id_role) REFERENCES role_utilisateur(id)
 );
 
 CREATE TABLE tarifs_ressources(
    id INT AUTO_INCREMENT,
-   prix_unitaire DECIMAL(15,2) NOT NULL,
+   prix_unitaire DECIMAL(15,2)   NOT NULL,
    date_saisie DATETIME,
    id_unite_tarif INT NOT NULL,
    id_ressource INT NOT NULL,
    PRIMARY KEY(id),
-   FOREIGN KEY(id_unite_tarif) REFERENCES unite_tarif(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY(id_ressource) REFERENCES ressources(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE
+   FOREIGN KEY(id_unite_tarif) REFERENCES unite_tarif(id),
+   FOREIGN KEY(id_ressource) REFERENCES ressources(id)
 );
 
 CREATE TABLE tarifs_accessoires(
    id INT AUTO_INCREMENT,
-   prix_unitaire DECIMAL(15,2) NOT NULL,
+   prix_unitaire DECIMAL(15,2)   NOT NULL,
    date_saisie DATETIME NOT NULL,
    id_unite_tarif INT NOT NULL,
    id_accessoire INT NOT NULL,
    PRIMARY KEY(id),
-   FOREIGN KEY(id_unite_tarif) REFERENCES unite_tarif(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY(id_accessoire) REFERENCES accessoires(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE
+   FOREIGN KEY(id_unite_tarif) REFERENCES unite_tarif(id),
+   FOREIGN KEY(id_accessoire) REFERENCES accessoires(id)
 );
 
 CREATE TABLE reservations(
    id INT AUTO_INCREMENT,
-   reference VARCHAR(50),
+   reference VARCHAR(50) ,
    description TEXT NOT NULL,
    date_premier_jour DATE NOT NULL,
    date_dernier_jour DATE NOT NULL,
    date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
-   cout_total DECIMAL(15,2),
+   cout_total DECIMAL(15,2)  ,
    id_creer_par INT NOT NULL,
    id_client INT NOT NULL,
-   reference_client VARCHAR(50) NOT NULL,
+   reference_client VARCHAR(50)  NOT NULL,
    PRIMARY KEY(id, reference),
-   FOREIGN KEY(id_creer_par) REFERENCES utilisateur(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY(id_client, reference_client) REFERENCES clients(id, reference) 
-      ON DELETE CASCADE ON UPDATE CASCADE
+   FOREIGN KEY(id_creer_par) REFERENCES utilisateur(id),
+   FOREIGN KEY(id_client, reference_client) REFERENCES clients(id, reference)
 );
 
 CREATE TABLE reductions(
    id INT AUTO_INCREMENT,
-   motif VARCHAR(50),
-   valeur DECIMAL(3,2),
+   motif VARCHAR(50) ,
+   valeur DECIMAL(5,2)  ,
    id_reservation INT NOT NULL,
-   reference_reservation VARCHAR(50) NOT NULL,
+   reference_reservation VARCHAR(50)  NOT NULL,
    PRIMARY KEY(id),
-   FOREIGN KEY(id_reservation, reference_reservation) REFERENCES reservations(id, reference) 
-      ON DELETE CASCADE ON UPDATE CASCADE
+   FOREIGN KEY(id_reservation, reference_reservation) REFERENCES reservations(id, reference)
 );
 
 CREATE TABLE facture(
    id INT AUTO_INCREMENT,
-   reference VARCHAR(50),
+   reference VARCHAR(50) ,
    date_edition DATETIME NOT NULL,
-   montant_paye DECIMAL(15,2),
-   reste_a_payer DECIMAL(15,2),
+   montant_paye DECIMAL(15,2)  ,
+   reste_a_payer DECIMAL(15,2)  ,
    id_type_paiement INT NOT NULL,
    id_reservation INT NOT NULL,
-   reference_reservation VARCHAR(50) NOT NULL,
+   reference_reservation VARCHAR(50)  NOT NULL,
    id_creer_par INT NOT NULL,
    PRIMARY KEY(id, reference),
-   FOREIGN KEY(id_type_paiement) REFERENCES type_paiement(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY(id_reservation, reference_reservation) REFERENCES reservations(id, reference) 
-      ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY(id_creer_par) REFERENCES utilisateur(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE
+   FOREIGN KEY(id_type_paiement) REFERENCES type_paiement(id),
+   FOREIGN KEY(id_reservation, reference_reservation) REFERENCES reservations(id, reference),
+   FOREIGN KEY(id_creer_par) REFERENCES utilisateur(id)
 );
 
 CREATE TABLE recus(
    id INT AUTO_INCREMENT,
-   reference VARCHAR(50),
+   reference VARCHAR(50) ,
    date_edition DATETIME NOT NULL,
-   reference_paiement VARCHAR(100) NOT NULL,
+   reference_paiement VARCHAR(100)  NOT NULL,
    id_mode_paiement INT NOT NULL,
    id_facture INT NOT NULL,
-   reference_facture VARCHAR(50) NOT NULL,
+   reference_facture VARCHAR(50)  NOT NULL,
    creer_par INT NOT NULL,
    PRIMARY KEY(id, reference),
    UNIQUE(id_facture, reference_facture),
-   FOREIGN KEY(id_mode_paiement) REFERENCES mode_paiement(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY(id_facture, reference_facture) REFERENCES facture(id, reference) 
-      ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY(creer_par) REFERENCES utilisateur(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE
+   FOREIGN KEY(id_mode_paiement) REFERENCES mode_paiement(id),
+   FOREIGN KEY(id_facture, reference_facture) REFERENCES facture(id, reference),
+   FOREIGN KEY(creer_par) REFERENCES utilisateur(id)
 );
 
 CREATE TABLE ressources_reservation(
    id_reservation INT,
-   reference_reservation VARCHAR(50),
+   reference_reservation VARCHAR(50) ,
    id_tarif_ressource INT,
    id_ressource INT,
-   quantite DECIMAL(15,2) NOT NULL,
+   quantite DECIMAL(15,2)   NOT NULL,
    debut_utilisation DATETIME,
    fin_utilisation DATETIME,
    PRIMARY KEY(id_reservation, reference_reservation, id_tarif_ressource, id_ressource),
-   FOREIGN KEY(id_reservation, reference_reservation) REFERENCES reservations(id, reference) 
-      ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY(id_tarif_ressource) REFERENCES tarifs_ressources(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY(id_ressource) REFERENCES ressources(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE
+   FOREIGN KEY(id_reservation, reference_reservation) REFERENCES reservations(id, reference),
+   FOREIGN KEY(id_tarif_ressource) REFERENCES tarifs_ressources(id),
+   FOREIGN KEY(id_ressource) REFERENCES ressources(id)
 );
 
 CREATE TABLE accessoires_reservation(
    id_reservation INT,
-   reference_reservation VARCHAR(50),
+   reference_reservation VARCHAR(50) ,
    id_accessoire INT,
    id_tarif_accessoire INT,
    quantite INT NOT NULL,
    debut_utilisation DATETIME,
    fin_utilisation DATETIME,
    PRIMARY KEY(id_reservation, reference_reservation, id_accessoire, id_tarif_accessoire),
-   FOREIGN KEY(id_reservation, reference_reservation) REFERENCES reservations(id, reference) 
-      ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY(id_accessoire) REFERENCES accessoires(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY(id_tarif_accessoire) REFERENCES tarifs_accessoires(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE
+   FOREIGN KEY(id_reservation, reference_reservation) REFERENCES reservations(id, reference),
+   FOREIGN KEY(id_accessoire) REFERENCES accessoires(id),
+   FOREIGN KEY(id_tarif_accessoire) REFERENCES tarifs_accessoires(id)
 );
 
 CREATE TABLE ressources_recu_occasionnel(
    id_ressource INT,
    id_tarif INT,
    id_recu INT,
-   quantite DECIMAL(15,2),
+   quantite DECIMAL(15,2)  ,
    debut_utilisation DATETIME NOT NULL,
    fin_utilisation DATETIME NOT NULL,
    PRIMARY KEY(id_ressource, id_tarif, id_recu),
-   FOREIGN KEY(id_ressource) REFERENCES ressources(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY(id_tarif) REFERENCES tarifs_ressources(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY(id_recu) REFERENCES recu_occasionnel(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE
+   FOREIGN KEY(id_ressource) REFERENCES ressources(id),
+   FOREIGN KEY(id_tarif) REFERENCES tarifs_ressources(id),
+   FOREIGN KEY(id_recu) REFERENCES recu_occasionnel(id)
 );
 
 CREATE TABLE accessoires_recu_occationnel(
    id_accessoire INT,
    id_tarif INT,
    id_recu INT,
-   quantite DECIMAL(15,2) NOT NULL,
+   quantite DECIMAL(15,2)   NOT NULL,
    debut_utilisation DATETIME NOT NULL,
    fin_utilisation DATETIME NOT NULL,
    PRIMARY KEY(id_accessoire, id_tarif, id_recu),
-   FOREIGN KEY(id_accessoire) REFERENCES accessoires(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY(id_tarif) REFERENCES tarifs_accessoires(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY(id_recu) REFERENCES recu_occasionnel(id) 
-      ON DELETE CASCADE ON UPDATE CASCADE
+   FOREIGN KEY(id_accessoire) REFERENCES accessoires(id),
+   FOREIGN KEY(id_tarif) REFERENCES tarifs_accessoires(id),
+   FOREIGN KEY(id_recu) REFERENCES recu_occasionnel(id)
 );
