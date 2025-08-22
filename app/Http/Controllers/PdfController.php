@@ -82,8 +82,8 @@ class PdfController extends Controller
         $qrBase64 = base64_encode($qrCode);
 
         // Calcul dynamique de la hauteur : base + nombre de lignes (ressources + accessoires)
-        $baseHauteur = 130;
-        $ligneHauteur = 18;
+        $baseHauteur = 400;
+        $ligneHauteur = 10;
         $nbLignes = count($reservation->ressources) + count($reservation->accessoires);
         $hauteurTotal = $baseHauteur + ($nbLignes * $ligneHauteur);
         $hauteurTotal += 100; // pour QR
