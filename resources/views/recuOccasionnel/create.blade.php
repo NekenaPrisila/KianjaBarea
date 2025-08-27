@@ -173,7 +173,7 @@
 
         <div class="text-end">
           <button type="submit" class="btn btn-primary">Enregistrer</button>
-          <a href="{{ route('recu-occasionnel.index') }}" class="btn btn-secondary">Annuler</a>
+          <a href="{{ route('recus-occasionnel.index') }}" class="btn btn-secondary">Annuler</a>
         </div>
       </form>
     </div>

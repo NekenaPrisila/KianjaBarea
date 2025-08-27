@@ -14,7 +14,7 @@
             </div>
 
             <!-- Formulaire de Recherche -->
-            <form id="searchForm" action="{{ route('recu-occasionnel.index') }}" method="GET">
+            <form id="searchForm" action="{{ route('recus-occasionnel.index') }}" method="GET">
                 <div class="row mb-3">
                     <label for="mode_paiement" class="col-sm-2 col-form-label">Mode de Paiement</label>
                     <div class="col-sm-10">
@@ -41,7 +41,7 @@
                     <label class="col-sm-2 col-form-label">Actions</label>
                     <div class="col-sm-10">
                         <button type="submit" class="btn btn-primary">Rechercher</button>
-                        <a href="{{ route('recu-occasionnel.index') }}" class="btn btn-secondary">Réinitialiser</a>
+                        <a href="{{ route('recus-occasionnel.index') }}" class="btn btn-secondary">Réinitialiser</a>
                     </div>
                 </div>
             </form>
