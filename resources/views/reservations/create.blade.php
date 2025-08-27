@@ -200,14 +200,18 @@
 {{-- JS pour gérer les popups et champs dynamiques --}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Autocomplete client
+  let editingId = null; // identifiant unique de la ligne en cours de modification
+
+  // --------------------
+  // AUTOCOMPLETE CLIENT
+  // --------------------
   let timer;
   document.getElementById('client_search').addEventListener('input', function() {
     clearTimeout(timer);
     let query = this.value.trim();
     let suggestions = document.getElementById('client_suggestions');
     suggestions.innerHTML = '';
-    if(query.length < 1) return; // Affiche dès le 1er caractère
+    if(query.length < 1) return;
     timer = setTimeout(() => {
       fetch(`/api/clients/search?query=${encodeURIComponent(query)}`)
         .then(r => r.json())
@@ -228,22 +232,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, 200);
   });
-
-  // Cacher suggestions si clic ailleurs
   document.addEventListener('click', function(e) {
     if(!document.getElementById('client_search').contains(e.target)) {
       document.getElementById('client_suggestions').innerHTML = '';
     }
   });
-
-  // Nouveau client: vider champ caché
   document.getElementById('validerNouveauClient').onclick = function() {
     document.getElementById('client_id').value = '';
     document.getElementById('client_search').value = '';
     document.getElementById('nouveauClientModal').querySelector('.btn-close').click();
   };
 
-  // Accessoire: charger tarifs selon accessoire choisi
+  // --------------------
+  // ACCESSOIRES
+  // --------------------
   document.getElementById('accessoire_id').onchange = function() {
     let tarifs = JSON.parse(this.selectedOptions[0].dataset.tarifs || '[]');
     let select = document.getElementById('accessoire_tarif');
@@ -255,7 +257,6 @@ document.addEventListener('DOMContentLoaded', function() {
   };
   document.getElementById('accessoire_id').dispatchEvent(new Event('change'));
 
-  // Ajouter accessoire
   document.getElementById('ajouterAccessoire').onclick = function() {
     let id = document.getElementById('accessoire_id').value;
     let nom = document.getElementById('accessoire_id').selectedOptions[0].text;
@@ -265,48 +266,82 @@ document.addEventListener('DOMContentLoaded', function() {
     let debut = document.getElementById('accessoire_debut').value;
     let fin = document.getElementById('accessoire_fin').value;
 
-    // Générer un identifiant unique pour ce set d'accessoire
-    let uniqueId = 'acc_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+    if(editingId) {
+      // --- Mode modification ---
+      let row = document.querySelector(`#accessoires-list tr[data-unique="${editingId}"]`);
+      row.innerHTML = `<td>${nom}</td><td>${quantite}</td><td>${tarif_prix} Ariary</td>
+        <td>${debut.replace('T',' ')}</td><td>${fin.replace('T',' ')}</td>
+        <td><button type="button" class="btn btn-warning btn-sm modifier-accessoire">Modifier</button>
+            <button type="button" class="btn btn-danger btn-sm supprimer-accessoire">Supprimer</button></td>`;
 
-    // Affichage dans le tableau
-    let list = document.getElementById('accessoires-list');
-    let row = document.createElement('tr');
-    row.setAttribute('data-unique', uniqueId);
-    row.innerHTML = `<td>${nom}</td><td>${quantite}</td><td>${tarif_prix} Ariary</td><td>${debut.replace('T',' ')}</td><td>${fin.replace('T',' ')}</td>
-      <td><button type="button" class="btn btn-danger btn-sm supprimer-accessoire">Supprimer</button></td>`;
-    list.appendChild(row);
+      document.querySelectorAll(`#hidden-accessoires input[data-unique="${editingId}"]`).forEach(el => el.remove());
+      let hiddenFields = [
+        {name: `accessoires[${id}][quantite]`, value: quantite},
+        {name: `accessoires[${id}][tarif_id]`, value: tarif_id},
+        {name: `accessoires[${id}][debut_utilisation]`, value: debut},
+        {name: `accessoires[${id}][fin_utilisation]`, value: fin},
+      ];
+      hiddenFields.forEach(f => {
+        let hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = f.name;
+        hidden.value = f.value;
+        hidden.setAttribute('data-unique', editingId);
+        document.getElementById('hidden-accessoires').appendChild(hidden);
+      });
+      editingId = null;
+    } else {
+      // --- Mode ajout ---
+      let uniqueId = 'acc_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+      let list = document.getElementById('accessoires-list');
+      let row = document.createElement('tr');
+      row.setAttribute('data-unique', uniqueId);
+      row.innerHTML = `<td>${nom}</td><td>${quantite}</td><td>${tarif_prix} Ariary</td>
+        <td>${debut.replace('T',' ')}</td><td>${fin.replace('T',' ')}</td>
+        <td><button type="button" class="btn btn-warning btn-sm modifier-accessoire">Modifier</button>
+            <button type="button" class="btn btn-danger btn-sm supprimer-accessoire">Supprimer</button></td>`;
+      list.appendChild(row);
 
-    // Champs cachés
-    let hiddenFields = [
-      {name: `accessoires[${id}][quantite]`, value: quantite},
-      {name: `accessoires[${id}][tarif_id]`, value: tarif_id},
-      {name: `accessoires[${id}][debut_utilisation]`, value: debut},
-      {name: `accessoires[${id}][fin_utilisation]`, value: fin},
-    ];
-    hiddenFields.forEach(f => {
-      let hidden = document.createElement('input');
-      hidden.type = 'hidden';
-      hidden.name = f.name;
-      hidden.value = f.value;
-      hidden.setAttribute('data-unique', uniqueId);
-      document.getElementById('hidden-accessoires').appendChild(hidden);
-    });
-
+      let hiddenFields = [
+        {name: `accessoires[${id}][quantite]`, value: quantite},
+        {name: `accessoires[${id}][tarif_id]`, value: tarif_id},
+        {name: `accessoires[${id}][debut_utilisation]`, value: debut},
+        {name: `accessoires[${id}][fin_utilisation]`, value: fin},
+      ];
+      hiddenFields.forEach(f => {
+        let hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = f.name;
+        hidden.value = f.value;
+        hidden.setAttribute('data-unique', uniqueId);
+        document.getElementById('hidden-accessoires').appendChild(hidden);
+      });
+    }
     document.getElementById('accessoireModal').querySelector('.btn-close').click();
   };
 
-  // Suppression accessoire
   document.getElementById('accessoires-list').addEventListener('click', function(e) {
     if(e.target.classList.contains('supprimer-accessoire')) {
       let row = e.target.closest('tr');
       let uniqueId = row.getAttribute('data-unique');
       row.remove();
-      // Supprimer les champs cachés associés
       document.querySelectorAll(`#hidden-accessoires input[data-unique="${uniqueId}"]`).forEach(el => el.remove());
+    }
+    if(e.target.classList.contains('modifier-accessoire')) {
+      let row = e.target.closest('tr');
+      editingId = row.getAttribute('data-unique');
+      let cells = row.querySelectorAll('td');
+      document.getElementById('accessoire_quantite').value = cells[1].textContent;
+      document.getElementById('accessoire_debut').value = cells[3].textContent.replace(' ','T');
+      document.getElementById('accessoire_fin').value = cells[4].textContent.replace(' ','T');
+      let modal = new bootstrap.Modal(document.getElementById('accessoireModal'));
+      modal.show();
     }
   });
 
-  // Ressource: charger tarifs selon ressource choisie
+  // --------------------
+  // RESSOURCES
+  // --------------------
   document.getElementById('ressource_id').onchange = function() {
     let tarifs = JSON.parse(this.selectedOptions[0].dataset.tarifs || '[]');
     let select = document.getElementById('ressource_tarif');
@@ -318,7 +353,6 @@ document.addEventListener('DOMContentLoaded', function() {
   };
   document.getElementById('ressource_id').dispatchEvent(new Event('change'));
 
-  // Ajouter ressource
   document.getElementById('ajouterRessource').onclick = function() {
     let id = document.getElementById('ressource_id').value;
     let nom = document.getElementById('ressource_id').selectedOptions[0].text;
@@ -328,46 +362,141 @@ document.addEventListener('DOMContentLoaded', function() {
     let debut = document.getElementById('ressource_debut').value;
     let fin = document.getElementById('ressource_fin').value;
 
-    // Générer un identifiant unique pour ce set de ressource
-    let uniqueId = 'res_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+    if(editingId) {
+      // --- Mode modification ---
+      let row = document.querySelector(`#ressources-list tr[data-unique="${editingId}"]`);
+      row.innerHTML = `<td>${nom}</td><td>${quantite}</td><td>${tarif_nom}</td>
+        <td>${debut.replace('T',' ')}</td><td>${fin.replace('T',' ')}</td>
+        <td><button type="button" class="btn btn-warning btn-sm modifier-ressource">Modifier</button>
+            <button type="button" class="btn btn-danger btn-sm supprimer-ressource">Supprimer</button></td>`;
 
-    // Affichage dans le tableau
-    let list = document.getElementById('ressources-list');
-    let row = document.createElement('tr');
-    row.setAttribute('data-unique', uniqueId);
-    row.innerHTML = `<td>${nom}</td><td>${quantite}</td><td>${tarif_nom}</td><td>${debut.replace('T',' ')}</td><td>${fin.replace('T',' ')}</td>
-      <td><button type="button" class="btn btn-danger btn-sm supprimer-ressource">Supprimer</button></td>`;
-    list.appendChild(row);
+      document.querySelectorAll(`#hidden-ressources input[data-unique="${editingId}"]`).forEach(el => el.remove());
+      let hiddenFields = [
+        {name: `ressources[${id}][quantite]`, value: quantite},
+        {name: `ressources[${id}][tarif_id]`, value: tarif_id},
+        {name: `ressources[${id}][debut_utilisation]`, value: debut},
+        {name: `ressources[${id}][fin_utilisation]`, value: fin},
+      ];
+      hiddenFields.forEach(f => {
+        let hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = f.name;
+        hidden.value = f.value;
+        hidden.setAttribute('data-unique', editingId);
+        document.getElementById('hidden-ressources').appendChild(hidden);
+      });
+      editingId = null;
+    } else {
+      // --- Mode ajout ---
+      let uniqueId = 'res_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+      let list = document.getElementById('ressources-list');
+      let row = document.createElement('tr');
+      row.setAttribute('data-unique', uniqueId);
+      row.innerHTML = `<td>${nom}</td><td>${quantite}</td><td>${tarif_nom}</td>
+        <td>${debut.replace('T',' ')}</td><td>${fin.replace('T',' ')}</td>
+        <td><button type="button" class="btn btn-warning btn-sm modifier-ressource">Modifier</button>
+            <button type="button" class="btn btn-danger btn-sm supprimer-ressource">Supprimer</button></td>`;
+      list.appendChild(row);
 
-    // Champs cachés
-    let hiddenFields = [
-      {name: `ressources[${id}][quantite]`, value: quantite},
-      {name: `ressources[${id}][tarif_id]`, value: tarif_id},
-      {name: `ressources[${id}][debut_utilisation]`, value: debut},
-      {name: `ressources[${id}][fin_utilisation]`, value: fin},
-    ];
-    hiddenFields.forEach(f => {
-      let hidden = document.createElement('input');
-      hidden.type = 'hidden';
-      hidden.name = f.name;
-      hidden.value = f.value;
-      hidden.setAttribute('data-unique', uniqueId);
-      document.getElementById('hidden-ressources').appendChild(hidden);
-    });
-
+      let hiddenFields = [
+        {name: `ressources[${id}][quantite]`, value: quantite},
+        {name: `ressources[${id}][tarif_id]`, value: tarif_id},
+        {name: `ressources[${id}][debut_utilisation]`, value: debut},
+        {name: `ressources[${id}][fin_utilisation]`, value: fin},
+      ];
+      hiddenFields.forEach(f => {
+        let hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = f.name;
+        hidden.value = f.value;
+        hidden.setAttribute('data-unique', uniqueId);
+        document.getElementById('hidden-ressources').appendChild(hidden);
+      });
+    }
     document.getElementById('ressourceModal').querySelector('.btn-close').click();
   };
 
-  // Suppression ressource
   document.getElementById('ressources-list').addEventListener('click', function(e) {
     if(e.target.classList.contains('supprimer-ressource')) {
       let row = e.target.closest('tr');
       let uniqueId = row.getAttribute('data-unique');
       row.remove();
-      // Supprimer les champs cachés associés
       document.querySelectorAll(`#hidden-ressources input[data-unique="${uniqueId}"]`).forEach(el => el.remove());
     }
+    if(e.target.classList.contains('modifier-ressource')) {
+      let row = e.target.closest('tr');
+      editingId = row.getAttribute('data-unique');
+      let cells = row.querySelectorAll('td');
+      document.getElementById('ressource_quantite').value = cells[1].textContent;
+      document.getElementById('ressource_debut').value = cells[3].textContent.replace(' ','T');
+      document.getElementById('ressource_fin').value = cells[4].textContent.replace(' ','T');
+      let modal = new bootstrap.Modal(document.getElementById('ressourceModal'));
+      modal.show();
+    }
   });
+
 });
 </script>
+@if(!empty($selectedResourceId) && !empty($selectedDate))
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Pré-sélectionne la ressource cliquée dans le calendrier
+    let ressourceSelect = document.getElementById('ressource_id');
+    ressourceSelect.value = "{{ $selectedResourceId }}";
+    ressourceSelect.dispatchEvent(new Event('change'));
+
+    // Récupère infos
+    let id = ressourceSelect.value;
+    let nom = ressourceSelect.selectedOptions[0].text;
+    let quantite = 1; // par défaut
+    let tarif_id = document.getElementById('ressource_tarif').value;
+    let tarif_nom = document.getElementById('ressource_tarif').selectedOptions[0].text;
+
+    function formatDateLocal(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+    let debut = "{{ $selectedDate }}"; // ex: 2025-08-27T09:00
+    let debutDate = new Date(debut.replace(" ", "T")); // corrige si espace
+
+    debutDate.setHours(debutDate.getHours() + 1);
+
+    let fin = formatDateLocal(debutDate);
+    console.log("Début:", debut, "Fin:", fin);
+
+    // Générer un identifiant unique
+    let uniqueId = 'res_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+
+    // Ajout dans le tableau
+    let list = document.getElementById('ressources-list');
+    let row = document.createElement('tr');
+    row.setAttribute('data-unique', uniqueId);
+    row.innerHTML = `<td>${nom}</td><td>${quantite}</td><td>${tarif_nom}</td><td>${debut.replace('T',' ')}</td><td>${fin.replace('T',' ')}</td>
+        <td><button type="button" class="btn btn-warning btn-sm modifier-ressource">Modifier</button>
+          <button type="button" class="btn btn-danger btn-sm supprimer-ressource">Supprimer</button></td>`;
+    list.appendChild(row);
+
+    // Champs cachés
+    let hiddenFields = [
+        {name: `ressources[${id}][quantite]`, value: quantite},
+        {name: `ressources[${id}][tarif_id]`, value: tarif_id},
+        {name: `ressources[${id}][debut_utilisation]`, value: debut},
+        {name: `ressources[${id}][fin_utilisation]`, value: fin},
+    ];
+    hiddenFields.forEach(f => {
+        let hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = f.name;
+        hidden.value = f.value;
+        hidden.setAttribute('data-unique', uniqueId);
+        document.getElementById('hidden-ressources').appendChild(hidden);
+    });
+});
+</script>
+@endif
 @endsection

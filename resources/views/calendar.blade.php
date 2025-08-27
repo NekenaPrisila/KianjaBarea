@@ -143,7 +143,17 @@
                 window.location.href = '/reservations/' + info.event.id;
             },
             dateClick: function(info) {
-                window.location.href = '/reservations/create?date=' + info.dateStr;
+                const resourceId = info.resource ? info.resource.id : null;
+                let date = info.dateStr.split('+')[0]; // enlève le fuseau
+                date = date.slice(0, 16); // garde uniquement YYYY-MM-DDTHH:mm
+
+                // On construit l’URL avec les paramètres GET
+                let url = '/reservations/create?date=' + encodeURIComponent(date);
+                if (resourceId) {
+                    url += '&resource_id=' + encodeURIComponent(resourceId);
+                }
+
+                window.location.href = url;
             }
         });
 

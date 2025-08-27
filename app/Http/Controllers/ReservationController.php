@@ -22,13 +22,24 @@ class ReservationController extends Controller
         return view('reservations.index', compact('reservations'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $clients = Client::all();
         $utilisateurs = Utilisateur::all();
         $accessoires = Accessoire::with('tarifs_accessoires.unite_tarif')->get();
         $ressources = Ressource::with('tarifs_ressources.unite_tarif')->get();
-        return view('reservations.create', compact('clients', 'utilisateurs', 'accessoires', 'ressources'));
+
+        $selectedResourceId = $request->input('resource_id');
+        $selectedDate = $request->input('date'); // format: 2025-08-22T10:00:00
+
+        return view('reservations.create', compact(
+            'clients',
+            'utilisateurs',
+            'accessoires',
+            'ressources',
+            'selectedResourceId',
+            'selectedDate'
+        ));
     }
 
     public function store(Request $request)
