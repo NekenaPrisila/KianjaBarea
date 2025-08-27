@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string $nom
  * 
+ * @property Collection|RecuOccasionnel[] $recu_occasionnels
  * @property Collection|Recu[] $recus
  *
  * @package App\Models
@@ -27,6 +28,11 @@ class ModePaiement extends Model
 	protected $fillable = [
 		'nom'
 	];
+
+	public function recu_occasionnels()
+	{
+		return $this->hasMany(RecuOccasionnel::class, 'id_mode_paiement');
+	}
 
 	public function recus()
 	{

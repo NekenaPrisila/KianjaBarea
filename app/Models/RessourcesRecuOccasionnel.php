@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id_ressource
  * @property int $id_tarif
  * @property int $id_recu_occasionnel
+ * @property string $reference_recu_occasionnel
  * @property float|null $quantite
  * @property Carbon $debut_utilisation
  * @property Carbon $fin_utilisation
@@ -58,6 +59,8 @@ class RessourcesRecuOccasionnel extends Model
 
 	public function recu_occasionnel()
 	{
-		return $this->belongsTo(RecuOccasionnel::class, 'id_recu_occasionnel');
+		return $this->belongsTo(RecuOccasionnel::class, 'id_recu_occasionnel')
+					->where('recu_occasionnel.id', '=', 'ressources_recu_occasionnel.id_recu_occasionnel')
+					->where('recu_occasionnel.reference', '=', 'ressources_recu_occasionnel.reference_recu_occasionnel');
 	}
 }

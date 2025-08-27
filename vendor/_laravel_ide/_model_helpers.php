@@ -265,6 +265,7 @@ namespace App\Models {
 	 * @property \Illuminate\Support\Carbon $fin_utilisation
 	 * @property \Illuminate\Support\Carbon $debut_utilisation
 	 * @property int $quantite
+	 * @property mixed $reference_recu_occasionnel
 	 * @property int $id_recu_occasionnel
 	 * @property int $id_tarif
 	 * @property int $id_accessoires
@@ -274,6 +275,7 @@ namespace App\Models {
 	 * @method static \Illuminate\Database\Eloquent\Builder<AccessoiresRecuOccasionnel>|AccessoiresRecuOccasionnel whereIdAccessoires($value)
 	 * @method static \Illuminate\Database\Eloquent\Builder<AccessoiresRecuOccasionnel>|AccessoiresRecuOccasionnel whereIdTarif($value)
 	 * @method static \Illuminate\Database\Eloquent\Builder<AccessoiresRecuOccasionnel>|AccessoiresRecuOccasionnel whereIdRecuOccasionnel($value)
+	 * @method static \Illuminate\Database\Eloquent\Builder<AccessoiresRecuOccasionnel>|AccessoiresRecuOccasionnel whereReferenceRecuOccasionnel($value)
 	 * @method static \Illuminate\Database\Eloquent\Builder<AccessoiresRecuOccasionnel>|AccessoiresRecuOccasionnel whereQuantite($value)
 	 * @method static \Illuminate\Database\Eloquent\Builder<AccessoiresRecuOccasionnel>|AccessoiresRecuOccasionnel whereDebutUtilisation($value)
 	 * @method static \Illuminate\Database\Eloquent\Builder<AccessoiresRecuOccasionnel>|AccessoiresRecuOccasionnel whereFinUtilisation($value)
@@ -1320,6 +1322,8 @@ namespace App\Models {
 	 *
 	 * @property mixed $nom
 	 * @property int $id
+	 * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\RecuOccasionnel> $recu_occasionnels
+	 * @property-read int|null $recu_occasionnels_count
 	 * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Recu> $recus
 	 * @property-read int|null $recus_count
 	 * @method static \Illuminate\Database\Eloquent\Builder<ModePaiement>|ModePaiement whereId($value)
@@ -1833,16 +1837,28 @@ namespace App\Models {
 	/**
 	 * App\Models\RecuOccasionnel
 	 *
+	 * @property int $id_mode_paiement
+	 * @property int $creer_par
+	 * @property float|null $cout_total
+	 * @property mixed $reference_paiement
 	 * @property mixed $motif
 	 * @property \Illuminate\Support\Carbon|null $date_edition
+	 * @property mixed $reference
 	 * @property int $id
+	 * @property-read \App\Models\Utilisateur $utilisateur
+	 * @property-read \App\Models\ModePaiement $mode_paiement
 	 * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Accessoire> $accessoires
 	 * @property-read int|null $accessoires_count
 	 * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Ressource> $ressources
 	 * @property-read int|null $ressources_count
 	 * @method static \Illuminate\Database\Eloquent\Builder<RecuOccasionnel>|RecuOccasionnel whereId($value)
+	 * @method static \Illuminate\Database\Eloquent\Builder<RecuOccasionnel>|RecuOccasionnel whereReference($value)
 	 * @method static \Illuminate\Database\Eloquent\Builder<RecuOccasionnel>|RecuOccasionnel whereDateEdition($value)
 	 * @method static \Illuminate\Database\Eloquent\Builder<RecuOccasionnel>|RecuOccasionnel whereMotif($value)
+	 * @method static \Illuminate\Database\Eloquent\Builder<RecuOccasionnel>|RecuOccasionnel whereReferencePaiement($value)
+	 * @method static \Illuminate\Database\Eloquent\Builder<RecuOccasionnel>|RecuOccasionnel whereCoutTotal($value)
+	 * @method static \Illuminate\Database\Eloquent\Builder<RecuOccasionnel>|RecuOccasionnel whereCreerPar($value)
+	 * @method static \Illuminate\Database\Eloquent\Builder<RecuOccasionnel>|RecuOccasionnel whereIdModePaiement($value)
 	 * @method static \Illuminate\Database\Eloquent\Builder<RecuOccasionnel>|RecuOccasionnel newModelQuery()
 	 * @method static \Illuminate\Database\Eloquent\Builder<RecuOccasionnel>|RecuOccasionnel newQuery()
 	 * @method static \Illuminate\Database\Eloquent\Builder<RecuOccasionnel>|RecuOccasionnel query()
@@ -2886,6 +2902,7 @@ namespace App\Models {
 	 * @property \Illuminate\Support\Carbon $fin_utilisation
 	 * @property \Illuminate\Support\Carbon $debut_utilisation
 	 * @property float|null $quantite
+	 * @property mixed $reference_recu_occasionnel
 	 * @property int $id_recu_occasionnel
 	 * @property int $id_tarif
 	 * @property int $id_ressource
@@ -2895,6 +2912,7 @@ namespace App\Models {
 	 * @method static \Illuminate\Database\Eloquent\Builder<RessourcesRecuOccasionnel>|RessourcesRecuOccasionnel whereIdRessource($value)
 	 * @method static \Illuminate\Database\Eloquent\Builder<RessourcesRecuOccasionnel>|RessourcesRecuOccasionnel whereIdTarif($value)
 	 * @method static \Illuminate\Database\Eloquent\Builder<RessourcesRecuOccasionnel>|RessourcesRecuOccasionnel whereIdRecuOccasionnel($value)
+	 * @method static \Illuminate\Database\Eloquent\Builder<RessourcesRecuOccasionnel>|RessourcesRecuOccasionnel whereReferenceRecuOccasionnel($value)
 	 * @method static \Illuminate\Database\Eloquent\Builder<RessourcesRecuOccasionnel>|RessourcesRecuOccasionnel whereQuantite($value)
 	 * @method static \Illuminate\Database\Eloquent\Builder<RessourcesRecuOccasionnel>|RessourcesRecuOccasionnel whereDebutUtilisation($value)
 	 * @method static \Illuminate\Database\Eloquent\Builder<RessourcesRecuOccasionnel>|RessourcesRecuOccasionnel whereFinUtilisation($value)
@@ -5194,6 +5212,8 @@ namespace App\Models {
 	 * @property-read \App\Models\RoleUtilisateur $role_utilisateur
 	 * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Facture> $factures
 	 * @property-read int|null $factures_count
+	 * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\RecuOccasionnel> $recu_occasionnels
+	 * @property-read int|null $recu_occasionnels_count
 	 * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Recu> $recus
 	 * @property-read int|null $recus_count
 	 * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Reservation> $reservations

@@ -46,13 +46,6 @@ CREATE TABLE type_client(
    UNIQUE(nom)
 );
 
-CREATE TABLE recu_occasionnel(
-   id INT AUTO_INCREMENT,
-   date_edition DATETIME,
-   motif TEXT NOT NULL,
-   PRIMARY KEY(id)
-);
-
 CREATE TABLE ressources(
    id INT AUTO_INCREMENT,
    nom VARCHAR(50)  NOT NULL,
@@ -110,6 +103,20 @@ CREATE TABLE tarifs_accessoires(
    PRIMARY KEY(id),
    FOREIGN KEY(id_unite_tarif) REFERENCES unite_tarif(id),
    FOREIGN KEY(id_accessoire) REFERENCES accessoires(id)
+);
+
+CREATE TABLE recu_occasionnel(
+   id INT AUTO_INCREMENT,
+   reference VARCHAR(50) ,
+   date_edition DATETIME,
+   motif TEXT NOT NULL,
+   reference_paiement VARCHAR(100) ,
+   cout_total DECIMAL(15,2)  ,
+   creer_par INT NOT NULL,
+   id_mode_paiement INT NOT NULL,
+   PRIMARY KEY(id, reference),
+   FOREIGN KEY(creer_par) REFERENCES utilisateur(id),
+   FOREIGN KEY(id_mode_paiement) REFERENCES mode_paiement(id)
 );
 
 CREATE TABLE reservations(
@@ -202,24 +209,26 @@ CREATE TABLE ressources_recu_occasionnel(
    id_ressource INT,
    id_tarif INT,
    id_recu_occasionnel INT,
+   reference_recu_occasionnel VARCHAR(50) ,
    quantite DECIMAL(15,2)  ,
    debut_utilisation DATETIME NOT NULL,
    fin_utilisation DATETIME NOT NULL,
-   PRIMARY KEY(id_ressource, id_tarif, id_recu_occasionnel),
+   PRIMARY KEY(id_ressource, id_tarif, id_recu_occasionnel, reference_recu_occasionnel),
    FOREIGN KEY(id_ressource) REFERENCES ressources(id),
    FOREIGN KEY(id_tarif) REFERENCES tarifs_ressources(id),
-   FOREIGN KEY(id_recu_occasionnel) REFERENCES recu_occasionnel(id)
+   FOREIGN KEY(id_recu_occasionnel, reference_recu_occasionnel) REFERENCES recu_occasionnel(id, reference)
 );
 
 CREATE TABLE accessoires_recu_occasionnel(
    id_accessoires INT,
    id_tarif INT,
    id_recu_occasionnel INT,
+   reference_recu_occasionnel VARCHAR(50) ,
    quantite INT NOT NULL,
    debut_utilisation DATETIME NOT NULL,
    fin_utilisation DATETIME NOT NULL,
-   PRIMARY KEY(id_accessoires, id_tarif, id_recu_occasionnel),
+   PRIMARY KEY(id_accessoires, id_tarif, id_recu_occasionnel, reference_recu_occasionnel),
    FOREIGN KEY(id_accessoires) REFERENCES accessoires(id),
    FOREIGN KEY(id_tarif) REFERENCES tarifs_accessoires(id),
-   FOREIGN KEY(id_recu_occasionnel) REFERENCES recu_occasionnel(id)
+   FOREIGN KEY(id_recu_occasionnel, reference_recu_occasionnel) REFERENCES recu_occasionnel(id, reference)
 );

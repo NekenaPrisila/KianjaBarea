@@ -17,6 +17,7 @@ use App\Http\Controllers\ModePaiementController;
 use App\Http\Controllers\UniteTarifController;
 use App\Http\Controllers\TypeClientController;
 use App\Http\Controllers\UtilisateurController;
+use App\Http\Controllers\RecuOccasionnelController;
 
 // Authentification
 Route::get('/', function () {
@@ -55,6 +56,8 @@ Route::get('/diagramme/statsChiffreAffaire', [DiagrammeController::class, 'chiff
 Route::resource('factures', FactureController::class)->middleware('role:commercial,caisse');
 
 Route::resource('recus', RecuController::class)->middleware('role:caisse');
+
+Route::resource('recu-occasionnel', RecuOccasionnelController::class)->middleware('role:caisse');
 
 Route::middleware('role:admin')->group(function () {
     Route::resource('type-ressource', TypeRessourceController::class);

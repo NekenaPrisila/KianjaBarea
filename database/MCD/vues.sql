@@ -67,10 +67,25 @@ LEFT JOIN (
 
 CREATE OR REPLACE VIEW vue_chiffre_affaire_mensuel AS
 SELECT 
-    YEAR(r.date_edition) AS annee,
-    MONTH(r.date_edition) AS mois,
-    SUM(f.montant_paye) AS chiffre_affaire
-FROM recus r
-JOIN facture f ON f.id = r.id_facture AND f.reference = r.reference_facture
-GROUP BY YEAR(r.date_edition), MONTH(r.date_edition)
+    YEAR(date_edition) AS annee,
+    MONTH(date_edition) AS mois,
+    SUM(montant) AS chiffre_affaire
+FROM (
+    -- Chiffre d'affaires des reçus classiques
+    SELECT 
+        r.date_edition,
+        f.montant_paye AS montant
+    FROM recus r
+    JOIN facture f ON f.id = r.id_facture AND f.reference = r.reference_facture
+
+    UNION ALL
+
+    -- Chiffre d'affaires des reçus occasionnels
+    SELECT
+        ro.date_edition,
+        ro.cout_total AS montant
+    FROM recu_occasionnel ro
+) AS total_recettes
+GROUP BY YEAR(date_edition), MONTH(date_edition)
 ORDER BY annee, mois;
+

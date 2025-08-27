@@ -39,7 +39,7 @@ class Accessoire extends Model
 	public function recu_occasionnels()
 	{
 		return $this->belongsToMany(RecuOccasionnel::class, 'accessoires_recu_occasionnel', 'id_accessoires', 'id_recu_occasionnel')
-					->withPivot('id_tarif', 'quantite', 'debut_utilisation', 'fin_utilisation');
+					->withPivot('id_tarif', 'reference_recu_occasionnel', 'quantite', 'debut_utilisation', 'fin_utilisation');
 	}
 
 	public function reservations()

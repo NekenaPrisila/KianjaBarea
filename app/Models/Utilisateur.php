@@ -20,6 +20,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * 
  * @property RoleUtilisateur $role_utilisateur
  * @property Collection|Facture[] $factures
+ * @property Collection|RecuOccasionnel[] $recu_occasionnels
  * @property Collection|Recu[] $recus
  * @property Collection|Reservation[] $reservations
  *
@@ -54,6 +55,11 @@ class Utilisateur extends Authenticatable
 	public function factures()
 	{
 		return $this->hasMany(Facture::class, 'id_creer_par');
+	}
+
+	public function recu_occasionnels()
+	{
+		return $this->hasMany(RecuOccasionnel::class, 'creer_par');
 	}
 
 	public function recus()

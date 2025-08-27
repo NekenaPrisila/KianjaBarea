@@ -37,7 +37,7 @@
 
     <li class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#facture-nav" data-bs-toggle="collapse">
-            <i class="bi bi-receipt"></i><span>Factures</span><i class="bi bi-chevron-down ms-auto"></i>
+            <i class="bi bi-file-earmark-text"></i><span>Factures</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul id="facture-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
             <li><a href="/factures"><i class="bi bi-list-ul"></i><span>Liste</span></a></li>
