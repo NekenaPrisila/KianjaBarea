@@ -8,7 +8,7 @@
     <div class="card-body">
       <h5 class="card-title">Création d'un nouveau reçu occasionnel</h5>
 
-      <form method="POST" action="{{ route('recu-occasionnel.store') }}">
+      <form method="POST" action="{{ route('recus-occasionnel.store') }}">
         @csrf
 
         {{-- Motif --}}
