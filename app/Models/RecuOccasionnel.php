@@ -42,6 +42,7 @@ class RecuOccasionnel extends Model
 	];
 
 	protected $fillable = [
+		'reference',
 		'date_edition',
 		'motif',
 		'reference_paiement',

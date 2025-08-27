@@ -51,12 +51,56 @@
               <th>Tarif</th>
               <th>Début utilisation</th>
               <th>Fin utilisation</th>
-              <th>Action</th>
+              <th>Action</th> {{-- Ajout colonne Action --}}
             </tr>
           </thead>
           <tbody id="accessoires-list"></tbody>
         </table>
-        <button type="button" class="btn btn-outline-success mb-3" data-bs-toggle="modal" data-bs-target="#accessoireModal">Ajouter un accessoire</button>
+        <button type="button" class="btn btn-outline-success mb-3" data-bs-toggle="modal" data-bs-target="#accessoireModal">
+          Ajouter un accessoire
+        </button>
+
+        {{-- Modal Accessoire --}}
+        <div class="modal fade" id="accessoireModal" tabindex="-1" aria-labelledby="accessoireModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="accessoireModalLabel">Ajouter un accessoire</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-3">
+                  <label for="accessoire_id" class="form-label">Accessoire</label>
+                  <select class="form-control" id="accessoire_id">
+                    @foreach($accessoires as $accessoire)
+                      <option value="{{ $accessoire->id }}" data-tarifs='@json($accessoire->tarifs_accessoires)'>{{ $accessoire->nom }}</option>
+                    @endforeach
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="accessoire_quantite" class="form-label">Quantité</label>
+                  <input type="number" min="1" class="form-control" id="accessoire_quantite">
+                </div>
+                <div class="mb-3">
+                  <label for="accessoire_tarif" class="form-label">Tarif</label>
+                  <select class="form-control" id="accessoire_tarif"></select>
+                </div>
+                <div class="mb-3">
+                  <label for="accessoire_debut" class="form-label">Début utilisation</label>
+                  <input type="datetime-local" class="form-control" id="accessoire_debut">
+                </div>
+                <div class="mb-3">
+                  <label for="accessoire_fin" class="form-label">Fin utilisation</label>
+                  <input type="datetime-local" class="form-control" id="accessoire_fin">
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="ajouterAccessoire">Ajouter</button>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {{-- Ressources --}}
         <hr>
@@ -69,12 +113,56 @@
               <th>Tarif</th>
               <th>Début utilisation</th>
               <th>Fin utilisation</th>
-              <th>Action</th>
+              <th>Action</th> {{-- Ajout colonne Action --}}
             </tr>
           </thead>
           <tbody id="ressources-list"></tbody>
         </table>
-        <button type="button" class="btn btn-outline-success mb-3" data-bs-toggle="modal" data-bs-target="#ressourceModal">Ajouter une ressource</button>
+        <button type="button" class="btn btn-outline-success mb-3" data-bs-toggle="modal" data-bs-target="#ressourceModal">
+          Ajouter une ressource
+        </button>
+
+        {{-- Modal Ressource --}}
+        <div class="modal fade" id="ressourceModal" tabindex="-1" aria-labelledby="ressourceModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="ressourceModalLabel">Ajouter une ressource</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-3">
+                  <label for="ressource_id" class="form-label">Ressource</label>
+                  <select class="form-control" id="ressource_id">
+                    @foreach($ressources as $ressource)
+                      <option value="{{ $ressource->id }}" data-tarifs='@json($ressource->tarifs_ressources)'>{{ $ressource->nom }}</option>
+                    @endforeach
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="ressource_quantite" class="form-label">Quantité</label>
+                  <input type="number" min="1" class="form-control" id="ressource_quantite">
+                </div>
+                <div class="mb-3">
+                  <label for="ressource_tarif" class="form-label">Tarif</label>
+                  <select class="form-control" id="ressource_tarif"></select>
+                </div>
+                <div class="mb-3">
+                  <label for="ressource_debut" class="form-label">Début utilisation</label>
+                  <input type="datetime-local" class="form-control" id="ressource_debut">
+                </div>
+                <div class="mb-3">
+                  <label for="ressource_fin" class="form-label">Fin utilisation</label>
+                  <input type="datetime-local" class="form-control" id="ressource_fin">
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="ajouterRessource">Ajouter</button>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {{-- Champs cachés pivot --}}
         <div id="hidden-accessoires"></div>

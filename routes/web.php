@@ -57,7 +57,7 @@ Route::resource('factures', FactureController::class)->middleware('role:commerci
 
 Route::resource('recus', RecuController::class)->middleware('role:caisse');
 
-Route::resource('recu-occasionnel', RecuOccasionnelController::class)->middleware('role:caisse');
+Route::resource('recus-occasionnel', RecuOccasionnelController::class)->middleware('role:caisse');
 
 Route::middleware('role:admin')->group(function () {
     Route::resource('type-ressource', TypeRessourceController::class);
@@ -78,4 +78,5 @@ Route::middleware('role:commercial')->group(function () {
 Route::middleware('role:caisse')->group(function () {
     Route::get('/recu/{id}/edit', [RecuController::class, 'editRecu'])->name('recu.edit');
     Route::get('/recu/{id}', [PdfController::class, 'printRecu'])->name('recu.generate');
+    Route::get('/recu-occasionnel/{id}', [PdfController::class, 'printRecuOccasionnel'])->name('recu-occasionnel.generate');
 });

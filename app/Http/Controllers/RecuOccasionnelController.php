@@ -16,7 +16,9 @@ class RecuOccasionnelController extends Controller
     public function index()
     {
         $recus = RecuOccasionnel::with(['accessoires', 'ressources'])->get();
-        return view('recuOccasionnel.index', compact('recus'));
+        $modesPaiement = ModePaiement::all();
+
+        return view('recuOccasionnel.index', compact('recus', 'modesPaiement'));
     }
 
     /**
@@ -36,44 +38,54 @@ class RecuOccasionnelController extends Controller
      */
     public function store(Request $request)
     {
+        // Validation des champs principaux
         $request->validate([
-            'client_id' => 'required|exists:clients,id',
             'motif' => 'required|string|max:255',
-            'date_edition' => 'nullable|date',
-            'accessoires.*.quantite' => 'required|integer|min:1',
-            'ressources.*.quantite' => 'required|integer|min:1',
+            'id_mode_paiement' => 'required|exists:mode_paiement,id',
+            'reference_paiement' => 'nullable|string|max:255',
+            'creer_par' => 'required|exists:utilisateur,id',
         ]);
 
+        // --- Créer le reçu occasionnel avec une référence temporaire ---
         $recu = RecuOccasionnel::create([
             'motif' => $request->motif,
-            'date_edition' => $request->date_edition ?? now(),
+            'id_mode_paiement' => $request->id_mode_paiement,
+            'reference_paiement' => $request->reference_paiement,
+            'date_edition' => now(),
+            'creer_par' => $request->creer_par,
+            'reference' => 'TEMP', // Référence temporaire
         ]);
 
-        // --- Accessoires ---
-        if ($request->has('accessoires')) {
-            foreach ($request->accessoires as $accessoireId => $data) {
-                $recu->accessoires()->attach($accessoireId, [
-                    'id_tarif' => $data['tarif_id'] ?? null,
-                    'quantite' => $data['quantite'] ?? 1,
-                    'debut_utilisation' => $data['debut_utilisation'] ?? null,
-                    'fin_utilisation' => $data['fin_utilisation'] ?? null,
-                ]);
-            }
+        // --- Générer une vraie référence basée sur la date + ID ---
+        $recu->reference = 'REC-OCCAS-' . now()->format('Ymd') . '-' . str_pad($recu->id, 4, '0', STR_PAD_LEFT);
+        $recu->save();
+
+        // --- Attacher les accessoires ---
+        $accessoires = $request->input('accessoires', []);
+        foreach ($accessoires as $accessoireId => $data) {
+            $recu->accessoires()->attach($accessoireId, [
+                'reference_recu_occasionnel' => $recu->reference,
+                'id_tarif' => $data['tarif_id'] ?? null,
+                'quantite' => $data['quantite'] ?? 1,
+                'debut_utilisation' => $data['debut_utilisation'] ?? null,
+                'fin_utilisation' => $data['fin_utilisation'] ?? null,
+            ]);
         }
 
-        // --- Ressources ---
-        if ($request->has('ressources')) {
-            foreach ($request->ressources as $ressourceId => $data) {
-                $recu->ressources()->attach($ressourceId, [
-                    'id_tarif' => $data['tarif_id'] ?? null,
-                    'quantite' => $data['quantite'] ?? 1,
-                    'debut_utilisation' => $data['debut_utilisation'] ?? null,
-                    'fin_utilisation' => $data['fin_utilisation'] ?? null,
-                ]);
-            }
+        // --- Attacher les ressources ---
+        $ressources = $request->input('ressources', []);
+        foreach ($ressources as $ressourceId => $data) {
+            $recu->ressources()->attach($ressourceId, [
+                'reference_recu_occasionnel' => $recu->reference,
+                'id_tarif' => $data['tarif_id'] ?? null,
+                'quantite' => $data['quantite'] ?? 1,
+                'debut_utilisation' => $data['debut_utilisation'] ?? null,
+                'fin_utilisation' => $data['fin_utilisation'] ?? null,
+            ]);
         }
 
-        return redirect()->route('recu-occasionnel.index')->with('success', 'Reçu occasionnel créé avec succès.');
+        return redirect()->route('recu-occasionnel.index')
+                        ->with('success', 'Reçu occasionnel créé avec succès !');
     }
 
     /**

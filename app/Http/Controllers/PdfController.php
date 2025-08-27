@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Reservation;
 use App\Models\Facture;
 use App\Models\Recu;
+use App\Models\RecuOccasionnel;
 use App\Models\TarifsRessource;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -98,6 +99,42 @@ class PdfController extends Controller
         ])->setPaper([0, 0, 165, $hauteurTotal], 'portrait');
 
         return $pdf->stream("Recu_{$recu->id}.pdf");
+    }
+
+    public function printRecuOccasionnel($id)
+    {
+        // Récupération du reçu occasionnel avec ses relations
+        $recu = RecuOccasionnel::with(['ressources', 'accessoires', 'mode_paiement', 'utilisateur'])
+            ->findOrFail($id);
+
+        // Montant total
+        $montant_net = $recu->cout_total;
+
+        // Montant en lettres
+        $formatter = new \NumberFormatter('fr', \NumberFormatter::SPELLOUT);
+        $montant_lettres = ucfirst($formatter->format(round($montant_net)));
+
+        // QR code
+        $qrText = "ID={$recu->id};Ref={$recu->reference};Motif={$recu->motif};Net={$montant_net};";
+        $qrCode = QrCode::format('svg')->size(100)->generate($qrText);
+        $qrBase64 = base64_encode($qrCode);
+
+        // Calcul dynamique de la hauteur : base + nombre de lignes (ressources + accessoires)
+        $baseHauteur = 300;
+        $ligneHauteur = 10;
+        $nbLignes = count($recu->ressources) + count($recu->accessoires);
+        $hauteurTotal = $baseHauteur + ($nbLignes * $ligneHauteur);
+        $hauteurTotal += 100; // marge pour QR code
+
+        // Charger la vue spéciale recu_occasionnel
+        $pdf = Pdf::loadView('pdfs.recu-occasionnel', [
+            'recu' => $recu,
+            'montant_net' => $montant_net,
+            'montant_lettres' => $montant_lettres,
+            'qrBase64' => $qrBase64,
+        ])->setPaper([0, 0, 165, $hauteurTotal], 'portrait');
+
+        return $pdf->stream("RecuOccasionnel_{$recu->id}.pdf");
     }
 
 }
