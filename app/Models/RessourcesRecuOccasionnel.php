@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * 
  * @property int $id_ressource
  * @property int $id_tarif
- * @property int $id_recu
+ * @property int $id_recu_occasionnel
  * @property float|null $quantite
  * @property Carbon $debut_utilisation
  * @property Carbon $fin_utilisation
@@ -34,7 +34,7 @@ class RessourcesRecuOccasionnel extends Model
 	protected $casts = [
 		'id_ressource' => 'int',
 		'id_tarif' => 'int',
-		'id_recu' => 'int',
+		'id_recu_occasionnel' => 'int',
 		'quantite' => 'float',
 		'debut_utilisation' => 'datetime',
 		'fin_utilisation' => 'datetime'
@@ -58,6 +58,6 @@ class RessourcesRecuOccasionnel extends Model
 
 	public function recu_occasionnel()
 	{
-		return $this->belongsTo(RecuOccasionnel::class, 'id_recu');
+		return $this->belongsTo(RecuOccasionnel::class, 'id_recu_occasionnel');
 	}
 }

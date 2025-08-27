@@ -201,25 +201,25 @@ CREATE TABLE accessoires_reservation(
 CREATE TABLE ressources_recu_occasionnel(
    id_ressource INT,
    id_tarif INT,
-   id_recu INT,
+   id_recu_occasionnel INT,
    quantite DECIMAL(15,2)  ,
    debut_utilisation DATETIME NOT NULL,
    fin_utilisation DATETIME NOT NULL,
-   PRIMARY KEY(id_ressource, id_tarif, id_recu),
+   PRIMARY KEY(id_ressource, id_tarif, id_recu_occasionnel),
    FOREIGN KEY(id_ressource) REFERENCES ressources(id),
    FOREIGN KEY(id_tarif) REFERENCES tarifs_ressources(id),
-   FOREIGN KEY(id_recu) REFERENCES recu_occasionnel(id)
+   FOREIGN KEY(id_recu_occasionnel) REFERENCES recu_occasionnel(id)
 );
 
-CREATE TABLE accessoires_recu_occationnel(
-   id_accessoire INT,
+CREATE TABLE accessoires_recu_occasionnel(
+   id_accessoires INT,
    id_tarif INT,
-   id_recu INT,
-   quantite DECIMAL(15,2)   NOT NULL,
+   id_recu_occasionnel INT,
+   quantite INT NOT NULL,
    debut_utilisation DATETIME NOT NULL,
    fin_utilisation DATETIME NOT NULL,
-   PRIMARY KEY(id_accessoire, id_tarif, id_recu),
-   FOREIGN KEY(id_accessoire) REFERENCES accessoires(id),
+   PRIMARY KEY(id_accessoires, id_tarif, id_recu_occasionnel),
+   FOREIGN KEY(id_accessoires) REFERENCES accessoires(id),
    FOREIGN KEY(id_tarif) REFERENCES tarifs_accessoires(id),
-   FOREIGN KEY(id_recu) REFERENCES recu_occasionnel(id)
+   FOREIGN KEY(id_recu_occasionnel) REFERENCES recu_occasionnel(id)
 );

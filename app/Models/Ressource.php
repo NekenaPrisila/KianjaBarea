@@ -50,7 +50,7 @@ class Ressource extends Model
 
 	public function recu_occasionnels()
 	{
-		return $this->belongsToMany(RecuOccasionnel::class, 'ressources_recu_occasionnel', 'id_ressource', 'id_recu')
+		return $this->belongsToMany(RecuOccasionnel::class, 'ressources_recu_occasionnel', 'id_ressource', 'id_recu_occasionnel')
 					->withPivot('id_tarif', 'quantite', 'debut_utilisation', 'fin_utilisation');
 	}
 

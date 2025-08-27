@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon|null $date_edition
  * @property string $motif
  * 
- * @property Collection|AccessoiresRecuOccationnel[] $accessoires_recu_occationnels
+ * @property Collection|Accessoire[] $accessoires
  * @property Collection|Ressource[] $ressources
  *
  * @package App\Models
@@ -36,14 +36,15 @@ class RecuOccasionnel extends Model
 		'motif'
 	];
 
-	public function accessoires_recu_occationnels()
+	public function accessoires()
 	{
-		return $this->hasMany(AccessoiresRecuOccationnel::class, 'id_recu');
+		return $this->belongsToMany(Accessoire::class, 'accessoires_recu_occasionnel', 'id_recu_occasionnel', 'id_accessoires')
+					->withPivot('id_tarif', 'quantite', 'debut_utilisation', 'fin_utilisation');
 	}
 
 	public function ressources()
 	{
-		return $this->belongsToMany(Ressource::class, 'ressources_recu_occasionnel', 'id_recu', 'id_ressource')
+		return $this->belongsToMany(Ressource::class, 'ressources_recu_occasionnel', 'id_recu_occasionnel', 'id_ressource')
 					->withPivot('id_tarif', 'quantite', 'debut_utilisation', 'fin_utilisation');
 	}
 }

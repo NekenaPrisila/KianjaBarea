@@ -10,12 +10,12 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class AccessoiresRecuOccationnel
+ * Class AccessoiresRecuOccasionnel
  * 
- * @property int $id_accessoire
+ * @property int $id_accessoires
  * @property int $id_tarif
- * @property int $id_recu
- * @property float $quantite
+ * @property int $id_recu_occasionnel
+ * @property int $quantite
  * @property Carbon $debut_utilisation
  * @property Carbon $fin_utilisation
  * 
@@ -25,17 +25,17 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class AccessoiresRecuOccationnel extends Model
+class AccessoiresRecuOccasionnel extends Model
 {
-	protected $table = 'accessoires_recu_occationnel';
+	protected $table = 'accessoires_recu_occasionnel';
 	public $incrementing = false;
 	public $timestamps = false;
 
 	protected $casts = [
-		'id_accessoire' => 'int',
+		'id_accessoires' => 'int',
 		'id_tarif' => 'int',
-		'id_recu' => 'int',
-		'quantite' => 'float',
+		'id_recu_occasionnel' => 'int',
+		'quantite' => 'int',
 		'debut_utilisation' => 'datetime',
 		'fin_utilisation' => 'datetime'
 	];
@@ -48,7 +48,7 @@ class AccessoiresRecuOccationnel extends Model
 
 	public function accessoire()
 	{
-		return $this->belongsTo(Accessoire::class, 'id_accessoire');
+		return $this->belongsTo(Accessoire::class, 'id_accessoires');
 	}
 
 	public function tarifs_accessoire()
@@ -58,6 +58,6 @@ class AccessoiresRecuOccationnel extends Model
 
 	public function recu_occasionnel()
 	{
-		return $this->belongsTo(RecuOccasionnel::class, 'id_recu');
+		return $this->belongsTo(RecuOccasionnel::class, 'id_recu_occasionnel');
 	}
 }

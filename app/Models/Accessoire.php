@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $nom
  * @property int|null $nombre_disponible
  * 
- * @property Collection|AccessoiresRecuOccationnel[] $accessoires_recu_occationnels
+ * @property Collection|RecuOccasionnel[] $recu_occasionnels
  * @property Collection|Reservation[] $reservations
  * @property Collection|TarifsAccessoire[] $tarifs_accessoires
  *
@@ -36,9 +36,10 @@ class Accessoire extends Model
 		'nombre_disponible'
 	];
 
-	public function accessoires_recu_occationnels()
+	public function recu_occasionnels()
 	{
-		return $this->hasMany(AccessoiresRecuOccationnel::class, 'id_accessoire');
+		return $this->belongsToMany(RecuOccasionnel::class, 'accessoires_recu_occasionnel', 'id_accessoires', 'id_recu_occasionnel')
+					->withPivot('id_tarif', 'quantite', 'debut_utilisation', 'fin_utilisation');
 	}
 
 	public function reservations()
