@@ -618,7 +618,7 @@ h6 {
   left: 0;
   bottom: 0;
   width: 250px;
-  z-index: 996;
+  z-index: 2000;
   transition: all 0.3s;
   padding: 20px 10px;
   overflow-y: auto;
@@ -694,6 +694,78 @@ h6 {
     display: none !important;
   }
 
+}
+
+/* Small-screen specific: fully hide sidebar when closed, show full sidebar when .sidebar-open is set
+   This ensures on mobile the collapsed/compact desktop behavior (icons-only) does NOT apply.
+*/
+@media (max-width: 600px) {
+  /* Ensure sidebar is off-canvas when closed */
+  .sidebar {
+    left: -110%; /* move fully out of view */
+    transition: left 0.25s ease, visibility 0.25s ease, opacity 0.25s ease;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* When mobile hamburger opens the menu, show full sidebar (icons + labels) as overlay */
+  body.sidebar-open .sidebar {
+    left: 0;
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Backdrop overlay to darken content when sidebar is open on mobile */
+  .mobile-sidebar-backdrop {
+    position: fixed;
+    inset: 0 0 0 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 1500;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    pointer-events: none;
+  }
+
+  body.sidebar-open .mobile-sidebar-backdrop {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Prevent desktop 'toggle-sidebar' compact style from leaking into small screens */
+  body.toggle-sidebar .sidebar {
+    left: -110%; /* keep hidden unless sidebar-open is set */
+    width: 250px;
+    padding: 20px 10px;
+  }
+
+  /* Hide links entirely when closed so no floating icons remain visible */
+  body:not(.sidebar-open) .sidebar .nav-link,
+  body:not(.sidebar-open) .sidebar .nav-content a {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* When open, ensure links are visible and behave normally */
+  body.sidebar-open .sidebar .nav-link,
+  body.sidebar-open .sidebar .nav-content a {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* On mobile we don't push the main content by default; overlay behavior is preferable */
+  #main,
+  #footer {
+    margin-left: 0 !important;
+  }
+
+  /* Mobile overlay: do not push or change #main/#footer when sidebar is open. */
+  /* body.sidebar-open #main / #footer intentionally left without margin changes so the sidebar overlays content. */
 }
 
 

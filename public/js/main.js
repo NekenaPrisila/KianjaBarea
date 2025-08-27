@@ -40,13 +40,9 @@
   }
 
   /**
-   * Sidebar toggle
+   * Sidebar toggle (handled later with desktop/mobile logic)
+   * initial simple handler removed to avoid conflict with mobile behavior
    */
-  if (select('.toggle-sidebar-btn')) {
-    on('click', '.toggle-sidebar-btn', function(e) {
-      select('body').classList.toggle('toggle-sidebar')
-    })
-  }
 
   /**
    * Search bar toggle
@@ -325,23 +321,219 @@
     });
   });
 
-  document.addEventListener('DOMContentLoaded', function() {
-    var activeMenu = localStorage.getItem('activeMenu');
-    if (activeMenu) {
-      document.querySelectorAll('.sidebar-nav .nav-link').forEach(function(link) {
-        if (link.getAttribute('href') === activeMenu) {
-          link.classList.add('active');
-          // Ouvre aussi le parent si c'est un sous-menu
-          let parent = link.closest('.nav-content');
-          if (parent) {
-            let parentLink = parent.previousElementSibling;
-            if (parentLink) parentLink.classList.remove('collapsed');
-            parent.style.display = 'block';
+  // Helper: normalize paths for reliable matching
+  function normalizePath(p) {
+    if (!p) return '/';
+    try {
+  return p.replace(/\\/g, '/').replace(/\/+$/, '') || '/';
+    } catch (e) {
+      return p;
+    }
+  }
+
+  // Set active menu item based on current URL (handles submenus)
+  function setActiveMenuByUrl() {
+    var url = normalizePath(window.location.pathname);
+    var found = false;
+
+    // clear previous states
+    document.querySelectorAll('.sidebar-nav .nav-link, .sidebar-nav .nav-content a').forEach(function(el) {
+      el.classList.remove('active');
+    });
+
+    // exact match on submenu links
+    document.querySelectorAll('.sidebar-nav .nav-content a[href]').forEach(function(sublink) {
+      var href = normalizePath(sublink.getAttribute('href'));
+    if (href === url) {
+        sublink.classList.add('active');
+        // open parent collapse using bootstrap
+        var navContent = sublink.closest('.nav-content');
+        if (navContent && navContent.id) {
+          var collapseEl = document.getElementById(navContent.id);
+          if (collapseEl) {
+            var bs = bootstrap.Collapse.getInstance(collapseEl) || new bootstrap.Collapse(collapseEl, {toggle: false});
+            bs.show();
           }
-        } else {
-          link.classList.remove('active');
+        }
+        var parentToggle = null;
+        if (navContent && navContent.id) {
+          parentToggle = document.querySelector('[data-bs-target="#' + navContent.id + '"]');
+        }
+        if (!parentToggle && navContent) parentToggle = navContent.previousElementSibling;
+        if (parentToggle && parentToggle.classList.contains('nav-link')) {
+          parentToggle.classList.add('active');
+          parentToggle.classList.remove('collapsed');
+          parentToggle.setAttribute('aria-expanded', 'true');
+        }
+        localStorage.setItem('activeMenu', sublink.getAttribute('href'));
+        found = true;
+      }
+    });
+
+    // exact match on top-level links
+    if (!found) {
+      document.querySelectorAll('.sidebar-nav > .nav-item > .nav-link[href]').forEach(function(link) {
+        var href = normalizePath(link.getAttribute('href'));
+  if (href === url) {
+          link.classList.add('active');
+          localStorage.setItem('activeMenu', link.getAttribute('href'));
+          found = true;
         }
       });
+    }
+
+    // fallback: subpath match for submenu (e.g. /clients/create -> /clients)
+    if (!found) {
+      document.querySelectorAll('.sidebar-nav .nav-content a[href]').forEach(function(sublink) {
+        var href = normalizePath(sublink.getAttribute('href'));
+    if (href !== '/' && url.indexOf(href) === 0) {
+          sublink.classList.add('active');
+          var navContent = sublink.closest('.nav-content');
+          if (navContent && navContent.id) {
+            var collapseEl = document.getElementById(navContent.id);
+            if (collapseEl) {
+              var bs = bootstrap.Collapse.getInstance(collapseEl) || new bootstrap.Collapse(collapseEl, {toggle: false});
+              bs.show();
+            }
+          }
+          var parentToggle = null;
+          if (navContent && navContent.id) {
+            parentToggle = document.querySelector('[data-bs-target="#' + navContent.id + '"]');
+          }
+          if (!parentToggle && navContent) parentToggle = navContent.previousElementSibling;
+          if (parentToggle && parentToggle.classList.contains('nav-link')) {
+            parentToggle.classList.add('active');
+            parentToggle.classList.remove('collapsed');
+            parentToggle.setAttribute('aria-expanded', 'true');
+          }
+          localStorage.setItem('activeMenu', sublink.getAttribute('href'));
+          found = true;
+        }
+      });
+    }
+
+    if (!found) {
+      localStorage.removeItem('activeMenu');
+    }
+  }
+
+  function handleResizeForSidebar() {
+    // Always recompute active menu; CSS controls visibility of icons/text on small screens
+    setActiveMenuByUrl();
+  }
+
+  // When toggling the sidebar via the hamburger, recompute active states so they appear when opened
+  var toggler = document.querySelector('.toggle-sidebar-btn');
+  if (toggler) {
+  // Ensure accessibility attributes
+  try { toggler.setAttribute('role', 'button'); toggler.tabIndex = 0; } catch (e) {}
+  // Ensure pointer events
+  toggler.style.pointerEvents = 'auto';
+
+  // Debug: log presence
+  console.log('[menu-debug] toggler found:', toggler, 'innerWidth=', window.innerWidth);
+
+    function toggleSidebarHandler(e) {
+      e && e.preventDefault && e.preventDefault();
+      e && e.stopPropagation && e.stopPropagation();
+        var isMobile = window.innerWidth <= 600;
+        if (isMobile) {
+          // mobile: toggle overlay open class only
+          document.body.classList.toggle('sidebar-open');
+          // ensure the desktop compact class isn't conflicting
+          document.body.classList.remove('toggle-sidebar');
+        } else {
+          // desktop: toggle compact sidebar (icons-only)
+          document.body.classList.toggle('toggle-sidebar');
+          // ensure mobile overlay class isn't present on desktop
+          document.body.classList.remove('sidebar-open');
+        }
+      // recompute active after the change
+      setTimeout(setActiveMenuByUrl, 120);
+    }
+
+    toggler.addEventListener('click', function(e){ console.log('[menu-debug] click event on toggler'); toggleSidebarHandler(e); });
+    toggler.addEventListener('touchstart', function(e){ console.log('[menu-debug] touchstart on toggler'); toggleSidebarHandler(e); }, {passive:false});
+    toggler.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' ') { console.log('[menu-debug] keydown toggler', e.key); toggleSidebarHandler(e); } });
+    // Also listen on document for delegated touches (fallback)
+    document.addEventListener('touchstart', function(e){
+      var t = e.target.closest && e.target.closest('.toggle-sidebar-btn');
+      if (t) { console.log('[menu-debug] delegated touchstart'); toggleSidebarHandler(e); }
+    }, {passive:false});
+  }
+
+  // Init and handlers for active menu (main + submenus)
+  document.addEventListener('DOMContentLoaded', function() {
+    // Set initial active according to current URL or localStorage
+    setActiveMenuByUrl();
+
+    // Ensure on small screens the sidebar is closed by default and only hamburger toggles it
+    if (window.innerWidth <= 600) {
+      document.body.classList.remove('toggle-sidebar');
+      document.body.classList.remove('sidebar-open');
+    }
+
+    // Persist and handle clicks on submenu items
+    document.querySelectorAll('.sidebar-nav .nav-content a').forEach(function(link) {
+      link.addEventListener('click', function() {
+        localStorage.setItem('activeMenu', link.getAttribute('href'));
+  // close mobile overlay on small screens to reveal content
+  if (window.innerWidth <= 600) document.body.classList.remove('sidebar-open');
+      });
+    });
+
+    // Persist clicks on top-level links with href
+    document.querySelectorAll('.sidebar-nav > .nav-item > .nav-link[href]').forEach(function(link) {
+      link.addEventListener('click', function() {
+        localStorage.setItem('activeMenu', link.getAttribute('href'));
+  if (window.innerWidth <= 600) document.body.classList.remove('sidebar-open');
+      });
+    });
+
+    // Ensure proper behavior on resize
+    window.addEventListener('resize', function() {
+      // If we shrink to mobile size, always close the sidebar and rely on hamburger
+      if (window.innerWidth <= 600) {
+        document.body.classList.remove('toggle-sidebar');
+        // keep sidebar closed when resizing into mobile unless user opens it
+        document.body.classList.remove('sidebar-open');
+      }
+      handleResizeForSidebar();
+    });
+
+    // Fallback: if on mobile the existing toggler isn't visible or clickable, create a temporary floating hamburger
+    if (window.innerWidth <= 600) {
+      try {
+        var mainToggler = document.querySelector('.toggle-sidebar-btn');
+        var togglerVisible = mainToggler && mainToggler.getBoundingClientRect && mainToggler.getBoundingClientRect().width > 0;
+        if (!togglerVisible) {
+          var fb = document.getElementById('mobile-hamburger-test');
+          if (!fb) {
+            fb = document.createElement('button');
+            fb.id = 'mobile-hamburger-test';
+            fb.setAttribute('aria-label', 'Ouvrir le menu');
+            fb.style.position = 'fixed';
+            fb.style.left = '12px';
+            fb.style.top = '8px';
+            fb.style.width = '44px';
+            fb.style.height = '44px';
+            fb.style.borderRadius = '8px';
+            fb.style.background = '#ffffff';
+            fb.style.border = '1px solid rgba(0,0,0,0.06)';
+            fb.style.zIndex = '2000';
+            fb.style.boxShadow = '0 6px 18px rgba(0,0,0,0.12)';
+            fb.style.display = 'flex';
+            fb.style.alignItems = 'center';
+            fb.style.justifyContent = 'center';
+            fb.innerHTML = '<i class="bi bi-list" style="font-size:20px;color:#2563eb"></i>';
+            document.body.appendChild(fb);
+            fb.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); document.body.classList.toggle('sidebar-open'); setTimeout(setActiveMenuByUrl,120); });
+            fb.addEventListener('touchstart', function(e){ e.preventDefault(); e.stopPropagation(); document.body.classList.toggle('sidebar-open'); setTimeout(setActiveMenuByUrl,120); }, {passive:false});
+          }
+        }
+      } catch (err) {
+        console.error('[menu-debug] fallback creation failed', err);
+      }
     }
   });
 
