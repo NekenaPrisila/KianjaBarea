@@ -20,9 +20,9 @@
             <div id="client_suggestions" class="list-group position-absolute w-100" style="z-index:1000;"></div>
           </div>
           <div class="col-sm-2">
-            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#nouveauClientModal">
+            <a href="{{ route('clients.create') }}" class="btn btn-outline-primary">
               Nouveau client
-            </button>
+            </a>
           </div>
         </div>
 
@@ -237,11 +237,6 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('client_suggestions').innerHTML = '';
     }
   });
-  document.getElementById('validerNouveauClient').onclick = function() {
-    document.getElementById('client_id').value = '';
-    document.getElementById('client_search').value = '';
-    document.getElementById('nouveauClientModal').querySelector('.btn-close').click();
-  };
 
   // --------------------
   // ACCESSOIRES

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\RecuOccasionnel;
 use App\Models\Accessoire;
 use App\Models\Ressource;
+use App\Models\ModePaiement;
 use Illuminate\Http\Request;
 
 class RecuOccasionnelController extends Controller
@@ -25,8 +26,9 @@ class RecuOccasionnelController extends Controller
     {
         $accessoires = Accessoire::with('tarifs_accessoires')->get();
         $ressources  = Ressource::with('tarifs_ressources')->get();
+        $modesPaiement = ModePaiement::all();
 
-        return view('recuOccasionnel.create', compact('accessoires', 'ressources'));
+        return view('recuOccasionnel.create', compact('accessoires', 'ressources', 'modesPaiement'));
     }
 
     /**
