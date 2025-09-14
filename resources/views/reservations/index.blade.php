@@ -10,7 +10,7 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="card-title mb-0">Recherche Réservations</h5>
                 <button id="toggleSearchBtn" class="btn btn-outline-primary btn-sm" type="button" aria-expanded="true" aria-controls="searchForm">
-                    <i id="toggleIcon" class="fas fa-minus"></i>
+                    <i id="toggleIcon" class="bi bi-dash"></i>
                 </button>
             </div>
 
@@ -112,25 +112,5 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const toggleBtn = document.getElementById('toggleSearchBtn');
-        const searchForm = document.getElementById('searchForm');
-        const toggleIcon = document.getElementById('toggleIcon');
-
-        toggleBtn.addEventListener('click', function () {
-            if (searchForm.style.display === 'none') {
-                searchForm.style.display = 'block';
-                toggleIcon.classList.remove('fa-plus');
-                toggleIcon.classList.add('fa-minus');
-                toggleBtn.setAttribute('aria-expanded', 'true');
-            } else {
-                searchForm.style.display = 'none';
-                toggleIcon.classList.remove('fa-minus');
-                toggleIcon.classList.add('fa-plus');
-                toggleBtn.setAttribute('aria-expanded', 'false');
-            }
-        });
-    });
-</script>
+@include('partials.toggle-search')
 @endsection
