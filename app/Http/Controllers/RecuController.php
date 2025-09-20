@@ -41,7 +41,7 @@ class RecuController extends Controller
         $recu->save();
 
         // Générer la référence avec la date + ID
-        $recu->reference = ' RECU-' . now()->format('Ymd') . '-' . str_pad($recu->id, 4, '0', STR_PAD_LEFT);
+        $recu->reference = 'RECU-' . now()->format('Ymd') . '-' . str_pad($recu->id, 4, '0', STR_PAD_LEFT);
 
         // Sauvegarder la référence mise à jour
         $recu->save();

@@ -78,7 +78,7 @@ class FactureController extends Controller
         $facture->save();
 
         // Générer la référence avec la date + ID
-        $facture->reference = ' FACT-' . now()->format('Ymd') . '-' . str_pad($facture->id, 4, '0', STR_PAD_LEFT);
+        $facture->reference = 'FACT-' . now()->format('Ymd') . '-' . str_pad($facture->id, 4, '0', STR_PAD_LEFT);
 
         // Sauvegarder la référence mise à jour
         $facture->save();
