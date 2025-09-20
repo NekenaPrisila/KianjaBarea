@@ -167,12 +167,12 @@
       </tr>
       <tr>
           <td class="text-right" colspan="3"><strong>Réduction ({{ $facture->reservation->getSommeReductions() }}%) :</strong></td>
-          <td class="text-right">-{{ number_format(($facture->reservation->getSommeReductions()*$facture->reservation->cout_total)/100, 2, ',', ' ') }}</td>
+          <td class="text-right">-{{ number_format(($facture->reservation->getSommeReductions() * $facture->reservation->cout_total)/100, 2, ',', ' ') }}</td>
       </tr>
       <tr>
           <td class="text-right" colspan="3"><strong>Montant après réduction :</strong></td>
           <td class="text-right">
-              {{ number_format($facture->reservation->cout_total - ($facture->reservation->getSommeReductions()*$facture->reservation->cout_total)/100, 2, ',', ' ') }}
+              {{ number_format($facture->reservation->cout_total - ($facture->reservation->getSommeReductions() * $facture->reservation->cout_total)/100, 2, ',', ' ') }}
           </td>
       </tr>
       <tr>
@@ -188,7 +188,7 @@
 
 @php
   $fmt = new NumberFormatter('fr', NumberFormatter::SPELLOUT);
-  $montant_lettres = ucfirst($fmt->format(round($facture->reservation->cout_total - ($facture->reservation->getSommeReductions()*$facture->reservation->cout_total)/100)));
+  $montant_lettres = ucfirst($fmt->format(round($facture->reservation->cout_total - $facture->montant_paye)));
 @endphp
 
 <p><strong>Arrêtée la présente facture à la somme de :</strong> {{ $montant_lettres }} ariary.</p>

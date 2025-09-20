@@ -48,6 +48,8 @@ class FactureController extends Controller
         $reductions = $reservation->getSommeReductions(); // Liste des réductions associées
 
         $montant_reduction = ($reductions * $montant_net)/100;
+        $montant_reduction = ($facture->reservation->getSommeReductions() * $facture->reservation->cout_total)/100;
+
 
         $montant_apres_reduction = $montant_net - $montant_reduction;
 
@@ -60,9 +62,10 @@ class FactureController extends Controller
             $montant_verse = $request->montant_acompte;
             $reste_a_payer = $montant_apres_reduction - $montant_verse;
 
-        } elseif ($request->montant_verse && $request->montant_verse < $montant_apres_reduction) {
-            $montant_verse = $request->montant_verse;
-            $reste_a_payer = $montant_apres_reduction - $montant_verse;
+        } elseif ($typePaiement && strtolower($typePaiement->nom) === 'reste') {
+            $reste = Facture::getResteAPayerParReservation($id);
+            $montant_verse = $reste;
+            $reste_a_payer = 0;
 
         } else {
             $montant_verse = $montant_apres_reduction;

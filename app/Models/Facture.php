@@ -73,4 +73,17 @@ class Facture extends Model
 	{
 		return $this->hasMany(Recu::class, 'id_facture');
 	}
+
+	public static function getResteAPayerParReservation($reservationId)
+    {
+        return self::where('id_reservation', $reservationId)
+                   ->orderByDesc('date_edition') // pour prendre la dernière facture si plusieurs
+                   ->value('reste_a_payer');
+    }
+
+	public static function getTotalMontantPaye($reservationId)
+	{
+		return self::where('id_reservation', $reservationId)
+				->sum('montant_paye');
+	}
 }

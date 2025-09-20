@@ -46,8 +46,8 @@ SELECT
     f.total_paye,
     f.reste_a_payer,
     CASE
-        WHEN f.nb_recu > 0 AND f.reste_a_payer = 0 THEN 'Payé'
-        WHEN f.nb_recu > 0 AND f.reste_a_payer > 0 THEN 'Acompte'
+        WHEN f.reste_a_payer = 0 AND f.nb_recu > 0 THEN 'Payé'
+        WHEN f.reste_a_payer > 0 AND f.nb_recu > 0 THEN 'Acompte'
         WHEN f.nb_recu = 0 OR f.nb_recu IS NULL THEN 'Non payé'
         ELSE 'Inconnu'
     END AS etat_paiement
@@ -57,13 +57,21 @@ LEFT JOIN (
         fac.id_reservation,
         fac.reference_reservation,
         SUM(COALESCE(fac.montant_paye, 0)) AS total_paye,
-        SUM(COALESCE(fac.reste_a_payer, 0)) AS reste_a_payer,
+        (SELECT f2.reste_a_payer
+         FROM facture f2
+         WHERE f2.id_reservation = fac.id_reservation
+         ORDER BY f2.date_edition DESC
+         LIMIT 1) AS reste_a_payer,
         COUNT(DISTINCT rec.id) AS nb_recu
     FROM facture fac
     LEFT JOIN recus rec 
-        ON rec.id_facture = fac.id AND rec.reference_facture = fac.reference
+        ON rec.id_facture = fac.id 
+       AND rec.reference_facture = fac.reference
     GROUP BY fac.id_reservation, fac.reference_reservation
-) f ON r.id = f.id_reservation AND r.reference = f.reference_reservation;
+) f 
+ON r.id = f.id_reservation 
+AND r.reference = f.reference_reservation;
+
 
 CREATE OR REPLACE VIEW vue_chiffre_affaire_mensuel AS
 SELECT 
