@@ -29,7 +29,6 @@
 </head>
 <body>
 <div class="receipt">
-    <div class="center logo">KBM</div>
     <div class="center logo"><img src="{{ public_path('img/logo_kbm.jpg') }}" alt="Logo KBM" style="max-width: 80px; max-height: 40px;"/></div>
     <div class="center title">REÇU DE PAIEMENT</div>
     <div class="center subtitle">Merci pour votre confiance</div>

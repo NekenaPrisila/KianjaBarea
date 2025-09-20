@@ -104,10 +104,10 @@
   <thead>
     <tr>
       <th>Ressources</th>
-      <th>PU</th>
+      <th>PU en Ar</th>
       <th>Qté</th>
       <th>unite</th>
-      <th>Montant</th>
+      <th>Montant en Ar</th>
     </tr>
   </thead>
   <tbody>

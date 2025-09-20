@@ -31,13 +31,19 @@ class RecuController extends Controller
         $recu = new Recu();
 
         $recu->date_edition = now();
-        $recu->reference = 'RECU-' . strtoupper(uniqid());
+        $recu->reference = 'Temporaire';
         $recu->id_mode_paiement = $request->id_mode_paiement;
         $recu->id_facture = $request->id_facture;
         $recu->reference_facture = $request->reference_facture;
         $recu->reference_paiement = $request->reference_paiement;
         $recu->creer_par = auth()->id();
 
+        $recu->save();
+
+        // Générer la référence avec la date + ID
+        $recu->reference = ' RECU-' . now()->format('Ymd') . '-' . str_pad($recu->id, 4, '0', STR_PAD_LEFT);
+
+        // Sauvegarder la référence mise à jour
         $recu->save();
 
         return redirect()->route('recus.index')->with('success', 'Reçu créé avec succès.');

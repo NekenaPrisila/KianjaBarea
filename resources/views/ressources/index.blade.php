@@ -21,8 +21,6 @@
                     <tr>
                         <th>Nom</th>
                         <th>Type</th>
-                        {{-- <th>Capacité</th>
-                        <th>Caution</th> --}}
                         <th>Tarifs</th>
                         <th>Actions</th>
                     </tr>
@@ -32,8 +30,6 @@
                     <tr>
                         <td>{{ $ressource->nom }}</td>
                         <td>{{ $ressource->type_ressource->nom }}</td>
-                        {{-- <td>{{ $ressource->capacite ?? '-' }}</td>
-                        <td>{{ $ressource->caution ? number_format($ressource->caution, 2, ',', ' ') . ' €' : '-' }}</td> --}}
                         <td>
                             @foreach($ressource->tarifs_ressources as $tarif)
                                 <span class="badge bg-primary">

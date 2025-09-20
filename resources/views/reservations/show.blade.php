@@ -15,7 +15,7 @@
     <div class="card">
         <div class="card-body">
 
-            <h4 class="card-title mb-4 text-center">Détails de la réservation</h4>
+            <h4 class="card-title mb-4 text-center">Détails de la réservation {{ $reservation->reference }}</h4>
  
             {{-- Informations principales --}}
             <div class="mb-4">

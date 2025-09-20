@@ -69,17 +69,18 @@ class FactureController extends Controller
             $reste_a_payer = 0;
         }
 
-        // Génération de la référence
-        $currentYear = now()->format('y');
-        $currentMonth = now()->format('m');
-        $reference = "FACT{$currentYear}{$currentMonth}_{$id}";
-
         // Création de la facture
-        $facture->reference = $reference;
+        $facture->reference = 'Temporaire';
         $facture->date_edition = now();
         $facture->montant_paye = $montant_verse;
         $facture->reste_a_payer = $reste_a_payer;
 
+        $facture->save();
+
+        // Générer la référence avec la date + ID
+        $facture->reference = ' FACT-' . now()->format('Ymd') . '-' . str_pad($facture->id, 4, '0', STR_PAD_LEFT);
+
+        // Sauvegarder la référence mise à jour
         $facture->save();
 
         // ✅ Rediriger ou retour
