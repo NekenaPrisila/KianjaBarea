@@ -14,9 +14,44 @@ class FactureController extends Controller
         $query = Facture::with(['reservation.client', 'utilisateur'])
             ->orderBy('date_edition', 'desc');
 
-        $factures = $query->paginate(20);
+        // Filtres GET
+        $clientId = $request->query('client_id');
+        $etat = $request->query('etat'); // 'reglee' or 'non_reglee'
+    $referenceReservation = $request->query('reference_reservation');
+        $typePaiement = $request->query('type_paiement');
 
-        return view('factures.index', compact('factures'));
+        if ($clientId) {
+            // factures liées à des réservations d'un client
+            $query->whereHas('reservation', function($q) use ($clientId) {
+                $q->where('id_client', $clientId);
+            });
+        }
+
+        if ($etat !== null && $etat !== '') {
+            if ($etat === 'reglee') {
+                // factures qui ont au moins un reçu
+                $query->whereHas('recus');
+            } elseif ($etat === 'non_reglee') {
+                $query->whereDoesntHave('recus');
+            }
+        }
+
+        if ($referenceReservation) {
+            // Filtrer par référence de la réservation liée
+            $query->whereHas('reservation', function($q) use ($referenceReservation) {
+                $q->where('reference', 'like', "%$referenceReservation%");
+            });
+        }
+
+        if ($typePaiement) {
+            $query->where('id_type_paiement', $typePaiement);
+        }
+
+        $factures = $query->paginate(20)->appends($request->query());
+
+        $types_paiement = TypePaiement::all();
+
+        return view('factures.index', compact('factures', 'types_paiement'));
     }
 
     public function editFacture($id)

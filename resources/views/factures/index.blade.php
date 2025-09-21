@@ -20,17 +20,44 @@
                     <div class="col-sm-10">
                         <select class="form-select" id="type_paiement" name="type_paiement">
                             <option value="">-- Tous --</option>
-                            <option value="acompte" {{ request('type_paiement') == 'acompte' ? 'selected' : '' }}>Acompte</option>
-                            <option value="totalite" {{ request('type_paiement') == 'totalite' ? 'selected' : '' }}>Totalité</option>
+                            @if(isset($types_paiement))
+                                @foreach($types_paiement as $tp)
+                                    <option value="{{ $tp->id }}" {{ request('type_paiement') == $tp->id ? 'selected' : '' }}>{{ $tp->nom }}</option>
+                                @endforeach
+                            @else
+                                <option value="acompte" {{ request('type_paiement') == 'acompte' ? 'selected' : '' }}>Acompte</option>
+                                <option value="totalite" {{ request('type_paiement') == 'totalite' ? 'selected' : '' }}>Totalité</option>
+                            @endif
+                        </select>
+                    </div>
+                </div>
+
+
+                <div class="row mb-3">
+                    <label for="client_search_factures" class="col-sm-2 col-form-label">Client</label>
+                    <div class="col-sm-10 position-relative">
+                        <input type="text" class="form-control" id="client_search_factures" name="client_name" autocomplete="off" placeholder="Rechercher un client par nom..." value="{{ request('client_name') }}">
+                        <input type="hidden" id="client_id_factures" name="client_id" value="{{ request('client_id') }}">
+                        <div id="client_suggestions_factures" class="list-group position-absolute w-100" style="z-index:1000;"></div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="etat" class="col-sm-2 col-form-label">État</label>
+                    <div class="col-sm-10">
+                        <select class="form-select" id="etat" name="etat">
+                            <option value="">-- Tous --</option>
+                            <option value="reglee" {{ request('etat') == 'reglee' ? 'selected' : '' }}>Réglée</option>
+                            <option value="non_reglee" {{ request('etat') == 'non_reglee' ? 'selected' : '' }}>Non réglée</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="row mb-3">
-                    <label for="reference" class="col-sm-2 col-form-label">Référence</label>
+                    <label for="reference_reservation" class="col-sm-2 col-form-label">Référence Réservation</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="reference" name="reference"
-                               value="{{ request('reference') }}" placeholder="Référence facture">
+                        <input type="text" class="form-control" id="reference_reservation" name="reference_reservation"
+                               value="{{ request('reference_reservation') }}" placeholder="Référence réservation">
                     </div>
                 </div>
 
@@ -56,6 +83,7 @@
                     <th>Date</th>
                     <th>Client</th>
                     <th>Réservation</th>
+                    <th>Type Paiement</th>
                     <th>Montant Payé (Ar)</th>
                     <th>Reste à Payer (Ar)</th>
                     @if(auth()->user()->role_utilisateur->role == 'commercial')
@@ -79,6 +107,7 @@
                         @endif
                     </td>
                     <td>{{ $facture->reference_reservation }}</td>
+                    <td>{{ $facture->type_paiement->nom ?? '—' }}</td>
                     <td>{{ number_format($facture->montant_paye, 0, ',', ' ') }}</td>
                     <td>{{ number_format($facture->reste_a_payer, 0, ',', ' ') }}</td>
                     @if(auth()->user()->role_utilisateur->role == 'commercial')
@@ -111,7 +140,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="9" class="text-center">Aucune facture trouvée</td>
+                    <td colspan="10" class="text-center">Aucune facture trouvée</td>
                 </tr>
                 @endforelse
             </tbody>
@@ -120,4 +149,50 @@
 </div>
 
 @include('partials.toggle-search')
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Autocomplete client pour factures
+    let timerFactures;
+    const input = document.getElementById('client_search_factures');
+    const suggestions = document.getElementById('client_suggestions_factures');
+
+    if (input) {
+        input.addEventListener('input', function() {
+            clearTimeout(timerFactures);
+            let query = this.value.trim();
+            suggestions.innerHTML = '';
+            document.getElementById('client_id_factures').value = '';
+            if (query.length < 1) return;
+            timerFactures = setTimeout(() => {
+                fetch(`/api/clients/search?query=${encodeURIComponent(query)}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        suggestions.innerHTML = '';
+                        data.forEach(client => {
+                            let item = document.createElement('button');
+                            item.type = 'button';
+                            item.className = 'list-group-item list-group-item-action';
+                            item.textContent = `${client.nom} (${client.reference})`;
+                            item.onclick = function() {
+                                input.value = client.nom + ' (' + client.reference + ')';
+                                document.getElementById('client_id_factures').value = client.id;
+                                suggestions.innerHTML = '';
+                            };
+                            suggestions.appendChild(item);
+                        });
+                    });
+            }, 200);
+        });
+
+        document.addEventListener('click', function(e) {
+            if(!input.contains(e.target)) {
+                suggestions.innerHTML = '';
+            }
+        });
+    }
+});
+</script>
 @endsection
