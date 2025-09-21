@@ -29,6 +29,7 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // routes/web.php
 Route::get('/api/clients/search', [ClientController::class, 'search']);
+Route::get('/api/ressources/search', [RessourceController::class, 'search']);
 
 // Ressources
 Route::resource('ressources', RessourceController::class)->middleware('role:commercial,dg,admin');

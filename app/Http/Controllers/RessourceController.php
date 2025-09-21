@@ -12,8 +12,27 @@ class RessourceController extends Controller
 {
     public function index()
     {
-        $ressources = Ressource::with('tarifs_ressources.unite_tarif')->get();
-        return view('ressources.index', compact('ressources'));
+        $query = Ressource::with('tarifs_ressources.unite_tarif');
+
+        // Filtre par nom (recherche libre) ou par id si fourni (autocomplete pattern)
+        if (request()->filled('ressource_id')) {
+            $query->where('id', request()->get('ressource_id'));
+        } else {
+            if (request()->filled('nom')) {
+                $query->where('nom', 'like', '%' . request()->get('nom') . '%');
+            }
+        }
+
+        // Filtre par type de ressource
+        if (request()->filled('id_type_ressource')) {
+            $query->where('id_type_ressource', request()->get('id_type_ressource'));
+        }
+
+        $ressources = $query->orderBy('nom')->get();
+
+        $typesRessource = TypeRessource::all();
+
+        return view('ressources.index', compact('ressources', 'typesRessource'));
     }
 
     public function create()
@@ -94,5 +113,17 @@ class RessourceController extends Controller
         $ressource->tarifs_ressources()->delete();
         $ressource->delete();
         return redirect()->route('ressources.index')->with('success', 'Ressource supprimée avec ses tarifs !');
+    }
+
+    /**
+     * Recherche pour autocomplete (API)
+     */
+    public function search(Request $request)
+    {
+        $q = $request->query('query');
+        $data = Ressource::where('nom', 'like', "%$q%")
+            ->limit(10)
+            ->get(['id', 'nom']);
+        return response()->json($data);
     }
 }

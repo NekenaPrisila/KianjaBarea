@@ -41,7 +41,6 @@
           <label class="col-sm-2 col-form-label">Actions</label>
           <div class="col-sm-10">
             <button type="submit" class="btn btn-primary">Rechercher</button>
-            <a href="{{ route('clients.index') }}" class="btn btn-secondary">Réinitialiser</a>
             <a href="{{ route('clients.create') }}" class="btn btn-success">Nouveau Client</a>
           </div>
         </div>

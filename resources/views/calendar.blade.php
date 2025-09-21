@@ -82,43 +82,10 @@
     }
 
     function filterEvents() {
-        const dateVal = document.getElementById('search-date').value;
-        const clientVal = document.getElementById('search-client').value.toLowerCase();
-        const keywordVal = document.getElementById('search-keyword').value.toLowerCase();
-        // Si seule la date est fournie (pas de client ni mot-clé),
-        // on se contente de naviguer vers cette date sans toucher aux events déjà affichés.
-        if (dateVal && !clientVal && !keywordVal) {
-            try {
-                mainCalendar.changeView('resourceTimelineDay');
-                mainCalendar.gotoDate(dateVal);
-            } catch (e) {
-                console.warn('Could not navigate calendar to date:', e);
-            }
-            return;
-        }
+        const dateVal = document.getElementById('search-date') ? document.getElementById('search-date').value : '';
 
-        // Sinon, on applique le filtrage (éventuellement en combinant avec la date)
-        const filtered = mainCalendarEvents.filter(event => {
-            // parse event.start safely to YYYY-MM-DD
-            let eventDate = '';
-            if (event.start) {
-                const d = new Date(event.start);
-                if (!isNaN(d)) {
-                    eventDate = d.toISOString().slice(0,10);
-                } else if (typeof event.start === 'string' && event.start.length >= 10) {
-                    // fallback: try substring
-                    eventDate = event.start.slice(0,10);
-                }
-            }
-
-            const matchesDate = dateVal ? (eventDate === dateVal) : true;
-            const matchesClient = clientVal ? (event.title && event.title.toLowerCase().includes(clientVal)) : true;
-            const matchesKeyword = keywordVal ? (event.title && event.title.toLowerCase().includes(keywordVal)) : true;
-
-            return matchesDate && matchesClient && matchesKeyword;
-        });
-
-        // Si une date est fournie en plus des autres filtres, naviguer aussi vers elle
+        // Si une date est fournie, on navigue simplement vers cette date en vue journalière
+        // et on ne modifie pas les events affichés (ils restent tels qu'initialement renderés).
         if (dateVal) {
             try {
                 mainCalendar.changeView('resourceTimelineDay');
@@ -127,9 +94,6 @@
                 console.warn('Could not navigate calendar to date:', e);
             }
         }
-
-        mainCalendar.removeAllEvents();
-        filtered.forEach(evt => mainCalendar.addEvent(evt));
     }
 
     // resetSearch removed — reinitialisation volontairement supprimée
