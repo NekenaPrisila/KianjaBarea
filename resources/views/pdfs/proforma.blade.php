@@ -95,7 +95,7 @@
 </header>
 
 <div class="proforma-info">
-  <p style="color: #A52A2A"><strong>Référence :</strong> KBM_{{ date('Y') }}{{ date('m') }}_{{ $reservation->id }}</p>
+  <p style="color: #A52A2A"><strong>Référence :</strong> KBM_{{ $reservation->reference }}</p>
   <p><strong>Date :</strong> {{ date('d/m/Y') }}</p>
   <p><strong>Client :</strong> {{ $client->nom }}</p>
   <p><strong>Référence client :</strong> {{ $reservation->reference_client }}</p>

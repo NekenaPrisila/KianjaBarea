@@ -21,7 +21,7 @@
 
     <li class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#ressource-nav" data-bs-toggle="collapse">
-            <i class="bi bi-archive"></i><span>Ressources</span><i class="bi bi-chevron-down ms-auto"></i>
+            <i class="bi bi-box-seam"></i><span>Ressources</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul id="ressource-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
             <li><a href="/ressources/create"><i class="bi bi-plus-circle"></i><span>Ajout</span></a></li>
