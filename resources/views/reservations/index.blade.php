@@ -40,6 +40,15 @@
                 </div>
 
                 <div class="row mb-3">
+                    <label for="client_search_index" class="col-sm-2 col-form-label">Client</label>
+                    <div class="col-sm-10 position-relative">
+                        <input type="text" class="form-control" id="client_search_index" name="client_name" autocomplete="off" placeholder="Rechercher un client par nom..." value="{{ request('client_name') }}">
+                        <input type="hidden" id="client_id_index" name="client_id" value="{{ request('client_id') }}">
+                        <div id="client_suggestions_index" class="list-group position-absolute w-100" style="z-index:1000;"></div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
                     <label class="col-sm-2 col-form-label">Filtrer</label>
                     <div class="col-sm-10">
                         <button type="submit" class="btn btn-primary">Rechercher</button>
@@ -113,4 +122,50 @@
 </div>
 
 @include('partials.toggle-search')
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Autocomplete client pour la page index
+    let timerIndex;
+    const input = document.getElementById('client_search_index');
+    const suggestions = document.getElementById('client_suggestions_index');
+
+    if (input) {
+        input.addEventListener('input', function() {
+            clearTimeout(timerIndex);
+            let query = this.value.trim();
+            suggestions.innerHTML = '';
+            document.getElementById('client_id_index').value = '';
+            if (query.length < 1) return;
+            timerIndex = setTimeout(() => {
+                fetch(`/api/clients/search?query=${encodeURIComponent(query)}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        suggestions.innerHTML = '';
+                        data.forEach(client => {
+                            let item = document.createElement('button');
+                            item.type = 'button';
+                            item.className = 'list-group-item list-group-item-action';
+                            item.textContent = `${client.nom} (${client.reference})`;
+                            item.onclick = function() {
+                                input.value = client.nom + ' (' + client.reference + ')';
+                                document.getElementById('client_id_index').value = client.id;
+                                suggestions.innerHTML = '';
+                            };
+                            suggestions.appendChild(item);
+                        });
+                    });
+            }, 200);
+        });
+
+        document.addEventListener('click', function(e) {
+            if(!input.contains(e.target)) {
+                suggestions.innerHTML = '';
+            }
+        });
+    }
+});
+</script>
 @endsection

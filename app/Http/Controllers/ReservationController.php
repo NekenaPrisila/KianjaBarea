@@ -15,10 +15,51 @@ class ReservationController extends Controller
 {
     public function index()
     {
-        $reservations = Reservation::with(['client', 'utilisateur', 'accessoires', 'ressources'])
-            ->orderBy('date_creation', 'desc')
-            ->get();
-        
+        $query = Reservation::with(['client', 'utilisateur', 'accessoires', 'ressources'])
+            ->orderBy('date_creation', 'desc');
+
+        // Appliquer filtres GET s'ils existent
+        $status = request()->query('status');
+        $statusPaiement = request()->query('status_paiement');
+        $clientId = request()->query('client_id');
+
+        if ($status !== null && $status !== '') {
+            // Ici on suppose que le mapping 1 => confirmée, 2 => en attente doit être adapté selon ton modèle
+            if ($status == '1') {
+                $query->whereHas('statutPaiement', function($q) {
+                    $q->where('statut_paiement', 'confirmée');
+                });
+            } elseif ($status == '2') {
+                $query->whereHas('statutPaiement', function($q) {
+                    $q->where('statut_paiement', '!=', 'confirmée');
+                });
+            }
+        }
+
+        if ($statusPaiement !== null && $statusPaiement !== '') {
+            // mapping des valeurs côté formulaire -> valeur attendue en base
+            if ($statusPaiement == '1') {
+                $query->whereHas('etatPaiement', function($q) {
+                    $q->where('etat_paiement', 'payé');
+                });
+            } elseif ($statusPaiement == '2') {
+                $query->whereHas('etatPaiement', function($q) {
+                    $q->where('etat_paiement', 'acompte');
+                });
+            } elseif ($statusPaiement == '3') {
+                $query->whereHas('etatPaiement', function($q) {
+                    $q->where('etat_paiement', 'non payé');
+                });
+            }
+        }
+
+        if ($clientId) {
+            // Filtrer par client_id directement
+            $query->where('id_client', $clientId);
+        }
+
+        $reservations = $query->get();
+
         return view('reservations.index', compact('reservations'));
     }
 
