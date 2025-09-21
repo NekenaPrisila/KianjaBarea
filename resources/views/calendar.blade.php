@@ -30,28 +30,12 @@
                     </div>
 
                     <div class="row mb-3">
-                        <label for="search-client" class="col-sm-2 col-form-label">Client</label>
-                        <div class="col-sm-10">
-                            <input type="text" id="search-client" class="form-control form-control-sm" placeholder="Nom du client">
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <label for="search-keyword" class="col-sm-2 col-form-label">Mot-clé</label>
-                        <div class="col-sm-10">
-                            <input type="text" id="search-keyword" class="form-control form-control-sm" placeholder="Recherche...">
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
                         <label class="col-sm-2 col-form-label">Actions</label>
                         <div class="col-sm-10">
                             <button type="button" class="btn btn-primary me-2" onclick="filterEvents()">
                                 <i class="bi bi-search me-1"></i> Rechercher
                             </button>
-                            <button type="button" class="btn btn-outline-secondary me-2" onclick="resetSearch()">
-                                <i class="bi bi-arrow-repeat"></i> Réinitialiser
-                            </button>
+                            <!-- Bouton Réinitialiser supprimé -->
                             <a href="{{ route('reservations.create') }}" class="btn btn-success">
                                 <i class="bi bi-plus-lg me-1"></i> Nouvelle réservation
                             </a>
@@ -101,24 +85,54 @@
         const dateVal = document.getElementById('search-date').value;
         const clientVal = document.getElementById('search-client').value.toLowerCase();
         const keywordVal = document.getElementById('search-keyword').value.toLowerCase();
+        // Si seule la date est fournie (pas de client ni mot-clé),
+        // on se contente de naviguer vers cette date sans toucher aux events déjà affichés.
+        if (dateVal && !clientVal && !keywordVal) {
+            try {
+                mainCalendar.changeView('resourceTimelineDay');
+                mainCalendar.gotoDate(dateVal);
+            } catch (e) {
+                console.warn('Could not navigate calendar to date:', e);
+            }
+            return;
+        }
 
+        // Sinon, on applique le filtrage (éventuellement en combinant avec la date)
         const filtered = mainCalendarEvents.filter(event => {
-            const matchesDate = dateVal ? event.start.slice(0,10) === dateVal : true;
-            const matchesClient = clientVal ? (event.title.toLowerCase().includes(clientVal)) : true;
-            const matchesKeyword = keywordVal ? (event.title.toLowerCase().includes(keywordVal)) : true;
+            // parse event.start safely to YYYY-MM-DD
+            let eventDate = '';
+            if (event.start) {
+                const d = new Date(event.start);
+                if (!isNaN(d)) {
+                    eventDate = d.toISOString().slice(0,10);
+                } else if (typeof event.start === 'string' && event.start.length >= 10) {
+                    // fallback: try substring
+                    eventDate = event.start.slice(0,10);
+                }
+            }
+
+            const matchesDate = dateVal ? (eventDate === dateVal) : true;
+            const matchesClient = clientVal ? (event.title && event.title.toLowerCase().includes(clientVal)) : true;
+            const matchesKeyword = keywordVal ? (event.title && event.title.toLowerCase().includes(keywordVal)) : true;
 
             return matchesDate && matchesClient && matchesKeyword;
         });
+
+        // Si une date est fournie en plus des autres filtres, naviguer aussi vers elle
+        if (dateVal) {
+            try {
+                mainCalendar.changeView('resourceTimelineDay');
+                mainCalendar.gotoDate(dateVal);
+            } catch (e) {
+                console.warn('Could not navigate calendar to date:', e);
+            }
+        }
 
         mainCalendar.removeAllEvents();
         filtered.forEach(evt => mainCalendar.addEvent(evt));
     }
 
-    function resetSearch() {
-        document.getElementById('search-form').reset();
-        mainCalendar.removeAllEvents();
-        mainCalendarEvents.forEach(evt => mainCalendar.addEvent(evt));
-    }
+    // resetSearch removed — reinitialisation volontairement supprimée
 
     document.addEventListener('DOMContentLoaded', function() {
         const resources = @json($resources);
