@@ -83,34 +83,6 @@
                 </div>
             </div>
 
-            <div class="details-card animated-fade-in" style="animation-delay: 0.2s;">
-                <div class="card-header">
-                    <div class="icon-box">
-                        <i class="bi bi-person"></i>
-                    </div>
-                    <h2 class="card-title">Client</h2>
-                </div>
-                <div class="card-body">
-                    <ul class="data-list">
-                        <li>
-                            <i class="bi bi-person-circle"></i>
-                            <strong>Nom:</strong>
-                            <span>{{ $reservation->client->nom ?? 'N/A' }}</span>
-                        </li>
-                        <li>
-                            <i class="bi bi-envelope"></i>
-                            <strong>Email:</strong>
-                            <span>{{ $reservation->client->email ?? 'N/A' }}</span>
-                        </li>
-                        <li>
-                            <i class="bi bi-telephone"></i>
-                            <strong>Téléphone:</strong>
-                            <span>{{ $reservation->client->telephone ?? 'N/A' }}</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
             {{-- Ressources réservées --}}
             <div class="details-card animated-fade-in" style="animation-delay: 0.3s;">
                 <div class="card-header">
@@ -148,6 +120,35 @@
         </div>
 
         <div class="col-lg-4">
+            {{-- Clients --}}
+            <div class="details-card animated-fade-in" style="animation-delay: 0.2s;">
+                <div class="card-header">
+                    <div class="icon-box">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    <h2 class="card-title">Client</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="data-list">
+                        <li>
+                            <i class="bi bi-person-circle"></i>
+                            <strong>Nom:</strong>
+                            <span>{{ $reservation->client->nom ?? 'N/A' }}</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-envelope"></i>
+                            <strong>Email:</strong>
+                            <span>{{ $reservation->client->email ?? 'N/A' }}</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-telephone"></i>
+                            <strong>Téléphone:</strong>
+                            <span>{{ $reservation->client->telephone ?? 'N/A' }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
             {{-- Accessoires --}}
             <div class="details-card animated-fade-in" style="animation-delay: 0.4s;">
                 <div class="card-header">
