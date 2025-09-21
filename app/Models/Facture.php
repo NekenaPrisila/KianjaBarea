@@ -77,7 +77,7 @@ class Facture extends Model
 	public static function getResteAPayerParReservation($reservationId)
     {
         return self::where('id_reservation', $reservationId)
-                   ->orderByDesc('date_edition') // pour prendre la dernière facture si plusieurs
+                   ->orderByDesc('date_edition')
                    ->value('reste_a_payer');
     }
 
@@ -86,4 +86,10 @@ class Facture extends Model
 		return self::where('id_reservation', $reservationId)
 				->sum('montant_paye');
 	}
+
+	public function estReglee()
+	{
+		return $this->recus()->exists();
+	}
+
 }

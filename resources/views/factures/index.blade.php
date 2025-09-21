@@ -58,6 +58,9 @@
                     <th>Réservation</th>
                     <th>Montant Payé (Ar)</th>
                     <th>Reste à Payer (Ar)</th>
+                    @if(auth()->user()->role_utilisateur->role == 'commercial')
+                        <th>État</th>
+                    @endif
                     @if(auth()->user()->role_utilisateur->role == 'caisse')
                         <th>Créé par</th>
                     @endif
@@ -78,14 +81,27 @@
                     <td>{{ $facture->reference_reservation }}</td>
                     <td>{{ number_format($facture->montant_paye, 0, ',', ' ') }}</td>
                     <td>{{ number_format($facture->reste_a_payer, 0, ',', ' ') }}</td>
+                    @if(auth()->user()->role_utilisateur->role == 'commercial')
+                        <td>
+                            @if ($facture->estReglee())
+                                ✅ Réglée
+                            @else
+                                ❌ Non réglée
+                            @endif
+                        </td>
+                    @endif
                     @if(auth()->user()->role_utilisateur->role == 'caisse')
                         <td>{{ $facture->utilisateur->nom_utilisateur ?? 'N/A' }}</td>
                     @endif
                     <td>
                         @if(auth()->user()->role_utilisateur->role == 'caisse')
-                            <a href="{{ route('recu.edit', $facture->id) }}" class="btn btn-sm btn-info">
-                                <i class="bi bi-printer"></i> Éditer le reçu
-                            </a>
+                            @if(!$facture->estReglee())
+                                <a href="{{ route('recu.edit', $facture->id) }}" class="btn btn-sm btn-info">
+                                    <i class="bi bi-printer"></i> Éditer le reçu
+                                </a>
+                            @else
+                                <span class="badge bg-success">Facture réglée</span>
+                            @endif
                         @else
                             <a href="{{ route('facture.generate', $facture->id) }}" target="_blank" class="btn btn-sm btn-info">
                                 <i class="bi bi-printer"></i> Imprimer

@@ -60,7 +60,8 @@ class FactureController extends Controller
                 return back()->withErrors(['montant_acompte' => 'Le montant de l\'acompte est requis.'])->withInput();
             }
             $montant_verse = $request->montant_acompte;
-            $reste_a_payer = $montant_apres_reduction - $montant_verse;
+            $MontantDejaPaye = Facture::getTotalMontantPaye($id);
+            $reste_a_payer = $montant_apres_reduction - $MontantDejaPaye - $montant_verse;
 
         } elseif ($typePaiement && strtolower($typePaiement->nom) === 'reste') {
             $reste = Facture::getResteAPayerParReservation($id);

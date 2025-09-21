@@ -1,7 +1,7 @@
 <ul class="sidebar-nav" id="sidebar-nav">
     <li class="nav-item">
         <a class="nav-link" href="/calendar">
-            <i class="bi bi-speedometer2"></i><span>Calendrier</span>
+            <i class="bi bi-calendar2-event"></i><span>Calendrier</span>
         </a>
     </li>
 

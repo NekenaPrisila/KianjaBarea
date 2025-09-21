@@ -1,28 +1,27 @@
--- Vue des réservations avec au moins un reçu
 CREATE OR REPLACE VIEW vue_reservations_statut_paiement AS
 SELECT 
     r.id AS reservation_id,
     r.reference AS reservation_reference,
     CASE
-        WHEN rc.id IS NOT NULL THEN 'confirmée'
+        WHEN COUNT(rc.id) > 0 THEN 'confirmée'
         ELSE 'en attente'
     END AS statut_paiement,
-    CASE 
-        WHEN rc.id IS NOT NULL THEN rc.date_edition
-        ELSE NULL
-    END AS date_confirmation
-FROM 
-    reservations r
-JOIN 
-    clients c ON r.id_client = c.id AND r.reference_client = c.reference
-LEFT JOIN 
-    facture f ON f.id_reservation = r.id AND f.reference_reservation = r.reference
-LEFT JOIN 
-    recus rc ON rc.id_facture = f.id AND rc.reference_facture = f.reference
-LEFT JOIN 
-    type_paiement tp ON f.id_type_paiement = tp.id
-LEFT JOIN 
-    mode_paiement mp ON rc.id_mode_paiement = mp.id;
+    MAX(rc.date_edition) AS date_confirmation
+FROM reservations r
+JOIN clients c 
+    ON r.id_client = c.id 
+   AND r.reference_client = c.reference
+LEFT JOIN facture f 
+    ON f.id_reservation = r.id 
+   AND f.reference_reservation = r.reference
+LEFT JOIN recus rc 
+    ON rc.id_facture = f.id 
+   AND rc.reference_facture = f.reference
+LEFT JOIN type_paiement tp 
+    ON f.id_type_paiement = tp.id
+LEFT JOIN mode_paiement mp 
+    ON rc.id_mode_paiement = mp.id
+GROUP BY r.id, r.reference;
 
 
 CREATE OR REPLACE VIEW vue_repartition_mensuelle_reservations AS
@@ -59,12 +58,15 @@ LEFT JOIN (
         SUM(COALESCE(fac.montant_paye, 0)) AS total_paye,
         (SELECT f2.reste_a_payer
          FROM facture f2
+         INNER JOIN recus r2
+             ON r2.id_facture = f2.id
+            AND r2.reference_facture = f2.reference
          WHERE f2.id_reservation = fac.id_reservation
          ORDER BY f2.date_edition DESC
          LIMIT 1) AS reste_a_payer,
         COUNT(DISTINCT rec.id) AS nb_recu
     FROM facture fac
-    LEFT JOIN recus rec 
+    INNER JOIN recus rec 
         ON rec.id_facture = fac.id 
        AND rec.reference_facture = fac.reference
     GROUP BY fac.id_reservation, fac.reference_reservation
