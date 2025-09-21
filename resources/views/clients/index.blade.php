@@ -16,18 +16,24 @@
       <!-- Formulaire recherche -->
       <form id="searchForm" action="{{ route('clients.index') }}" method="GET">
         <div class="row mb-3">
-          <label for="nom" class="col-sm-2 col-form-label">Nom</label>
-          <div class="col-sm-10">
-            <input type="text" id="nom" name="nom" class="form-control"
-                   value="{{ request('nom') }}" placeholder="Nom du client">
+          <label for="client_search_clients" class="col-sm-2 col-form-label">Nom</label>
+          <div class="col-sm-10 position-relative">
+            <input type="text" id="client_search_clients" name="nom" class="form-control"
+                   value="{{ request('nom') }}" placeholder="Rechercher un client par nom..." autocomplete="off">
+            <input type="hidden" id="client_id_clients" name="client_id" value="{{ request('client_id') }}">
+            <div id="client_suggestions_clients" class="list-group position-absolute w-100" style="z-index:1000;"></div>
           </div>
         </div>
 
         <div class="row mb-3">
-          <label for="telephone" class="col-sm-2 col-form-label">Téléphone</label>
+          <label for="id_type_client" class="col-sm-2 col-form-label">Type de client</label>
           <div class="col-sm-10">
-            <input type="text" id="telephone" name="telephone" class="form-control"
-                   value="{{ request('telephone') }}" placeholder="Numéro de téléphone">
+            <select id="id_type_client" name="id_type_client" class="form-select">
+              <option value="">-- Tous --</option>
+              @foreach($typesClient as $type)
+                <option value="{{ $type->id }}" {{ request('id_type_client') == $type->id ? 'selected' : '' }}>{{ $type->nom }}</option>
+              @endforeach
+            </select>
           </div>
         </div>
 
@@ -94,4 +100,49 @@
 </div>
 
 @include('partials.toggle-search')
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  let timerClients;
+  const input = document.getElementById('client_search_clients');
+  const suggestions = document.getElementById('client_suggestions_clients');
+
+  if (input) {
+    input.addEventListener('input', function() {
+      clearTimeout(timerClients);
+      let query = this.value.trim();
+      suggestions.innerHTML = '';
+      document.getElementById('client_id_clients').value = '';
+      if (query.length < 1) return;
+      timerClients = setTimeout(() => {
+        fetch(`/api/clients/search?query=${encodeURIComponent(query)}`)
+          .then(r => r.json())
+          .then(data => {
+            suggestions.innerHTML = '';
+            data.forEach(client => {
+              let item = document.createElement('button');
+              item.type = 'button';
+              item.className = 'list-group-item list-group-item-action';
+              item.textContent = `${client.nom} (${client.reference})`;
+              item.onclick = function() {
+                input.value = client.nom + ' (' + client.reference + ')';
+                document.getElementById('client_id_clients').value = client.id;
+                suggestions.innerHTML = '';
+              };
+              suggestions.appendChild(item);
+            });
+          });
+      }, 200);
+    });
+
+    document.addEventListener('click', function(e) {
+      if(!input.contains(e.target)) {
+        suggestions.innerHTML = '';
+      }
+    });
+  }
+});
+</script>
 @endsection

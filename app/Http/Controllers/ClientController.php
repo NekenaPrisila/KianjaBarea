@@ -13,17 +13,27 @@ class ClientController extends Controller
      */
     public function index(Request $request)
     {
-        $clients = Client::with('type_client')
-            ->when($request->nom, function ($query, $nom) {
-                return $query->where('nom', 'like', "%$nom%");
-            })
-            ->when($request->telephone, function ($query, $tel) {
-                return $query->where('telephone', 'like', "%$tel%");
-            })
-            ->orderBy('date_ajout', 'desc')
-            ->get();
+        $query = Client::with('type_client');
 
-        return view('clients.index', compact('clients'));
+        // Si un client_id est fourni (sélection via autocomplete), filtrer par id
+        if ($request->filled('client_id')) {
+            $query->where('id', $request->client_id);
+        } else {
+            $query->when($request->nom, function ($q, $nom) {
+                return $q->where('nom', 'like', "%$nom%");
+            });
+        }
+
+        // Filtre par type de client si fourni
+        if ($request->filled('id_type_client')) {
+            $query->where('id_type_client', $request->id_type_client);
+        }
+
+        $clients = $query->orderBy('date_ajout', 'desc')->get();
+
+        $typesClient = TypeClient::all();
+
+        return view('clients.index', compact('clients', 'typesClient'));
     }
 
     /**
