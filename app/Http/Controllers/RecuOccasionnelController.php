@@ -84,7 +84,7 @@ class RecuOccasionnelController extends Controller
             ]);
         }
 
-        return redirect()->route('recu-occasionnel.index')
+        return redirect()->route('recus-occasionnel.index')
                         ->with('success', 'Reçu occasionnel créé avec succès !');
     }
 
@@ -144,7 +144,7 @@ class RecuOccasionnelController extends Controller
         }
         $recuOccasionnel->ressources()->sync($ressourcesData);
 
-        return redirect()->route('recu-occasionnel.index')->with('success', 'Reçu occasionnel mis à jour avec succès.');
+        return redirect()->route('recus-occasionnel.index')->with('success', 'Reçu occasionnel mis à jour avec succès.');
     }
 
     /**
@@ -156,6 +156,6 @@ class RecuOccasionnelController extends Controller
         $recuOccasionnel->ressources()->detach();
         $recuOccasionnel->delete();
 
-        return redirect()->route('recu-occasionnel.index')->with('success', 'Reçu occasionnel supprimé avec succès.');
+        return redirect()->route('recus-occasionnel.index')->with('success', 'Reçu occasionnel supprimé avec succès.');
     }
 }

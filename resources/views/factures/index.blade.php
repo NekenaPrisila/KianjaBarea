@@ -89,9 +89,9 @@
                     @if(auth()->user()->role_utilisateur->role == 'commercial')
                         <th>État</th>
                     @endif
-                    @if(auth()->user()->role_utilisateur->role == 'caisse')
+                    {{-- @if(auth()->user()->role_utilisateur->role == 'caisse')
                         <th>Créé par</th>
-                    @endif
+                    @endif --}}
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -119,9 +119,9 @@
                             @endif
                         </td>
                     @endif
-                    @if(auth()->user()->role_utilisateur->role == 'caisse')
+                    {{-- @if(auth()->user()->role_utilisateur->role == 'caisse')
                         <td>{{ $facture->utilisateur->nom_utilisateur ?? 'N/A' }}</td>
-                    @endif
+                    @endif --}}
                     <td>
                         @if(auth()->user()->role_utilisateur->role == 'caisse')
                             @if(!$facture->estReglee())
