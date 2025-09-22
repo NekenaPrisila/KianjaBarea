@@ -22,20 +22,6 @@
                value="{{ old('nom', $ressource->nom ?? '') }}" required>
       </div>
 
-      {{-- Caution --}}
-      <div class="mb-3">
-        <label class="form-label">Caution</label>
-        <input type="number" step="0.01" class="form-control" name="caution" 
-               value="{{ old('caution', $ressource->caution ?? '') }}">
-      </div>
-
-      {{-- Capacité --}}
-      <div class="mb-3">
-        <label class="form-label">Capacité</label>
-        <input type="number" class="form-control" name="capacite" 
-               value="{{ old('capacite', $ressource->capacite ?? '') }}">
-      </div>
-
       {{-- Type Ressource --}}
       <div class="mb-3">
         <label class="form-label">Type *</label>
