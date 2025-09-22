@@ -397,3 +397,8 @@
         grid-template-columns: 1fr;
     }
 }
+
+.input-group .form-control {
+    flex: 1 1 auto;
+    width: 1%;
+}

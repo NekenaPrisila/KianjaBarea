@@ -55,6 +55,12 @@
                             <div class="info-label">Date du dernier jour</div>
                             <div class="info-value">{{ \Carbon\Carbon::parse($reservation->date_dernier_jour)->format('d/m/Y') }}</div>
                         </div>
+                        <div class="info-item">
+                            <div class="info-label">Description de la réservation</div>
+                            <div class="info-value">
+                                {{ $reservation->description ?? 'Aucune description fournie pour cette réservation.' }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -237,7 +243,6 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     // Animation for elements
     document.addEventListener('DOMContentLoaded', function() {
