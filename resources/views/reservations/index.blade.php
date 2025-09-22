@@ -99,12 +99,13 @@
                     <td>{{ number_format($reservation->cout_total, 2, ',', ' ') }}</td>
                     <td>{{ number_format($reservation->getSommeReductions(), 2, ',', ' ') }}</td>
                     <td>
-                        <span class="badge bg-{{ 
-                            $reservation->etatPaiement?->etat_paiement === 'payé' ? 'success' : (
-                                $reservation->etatPaiement?->etat_paiement === 'accepté' ? 'warning' : 'danger') 
-                        }}">
-                            {{ ucfirst($reservation->etatPaiement?->etat_paiement ?? 'Inconnu') }}
-                        </span>
+                        @if ($reservation->etatPaiement?->etat_paiement === 'Payé')
+                            ✅ Payé
+                        @elseif ($reservation->etatPaiement?->etat_paiement === 'Acompte')
+                            ⚠️ Acompte
+                        @else
+                            ❌ Non payé
+                        @endif
                     </td>
                     @if(auth()->user()->role_utilisateur->role == 'dg')
                         <td>{{ $reservation->utilisateur->nom_utilisateur ?? 'N/A' }}</td>

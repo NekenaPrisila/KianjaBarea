@@ -11,7 +11,7 @@ class RecuController extends Controller
 {
     public function index(Request $request)
     {
-        $recus = Recu::all();
+        $recus = Recu::orderBy('date_edition', 'desc')->get();
 
         $modesPaiement = ModePaiement::all();
 

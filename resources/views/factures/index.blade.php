@@ -80,7 +80,7 @@
             <thead>
                 <tr>
                     <th>Référence</th>
-                    <th>Date</th>
+                    <th>Date édition</th>
                     <th>Client</th>
                     <th>Réservation</th>
                     <th>Type Paiement</th>

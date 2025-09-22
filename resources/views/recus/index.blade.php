@@ -56,7 +56,7 @@
             <thead>
                 <tr>
                     <th>Référence</th>
-                    <th>Date</th>
+                    <th>Date édition</th>
                     <th>Facture Associée</th>
                     <th>Client</th>
                     <th>Mode Paiement</th>
