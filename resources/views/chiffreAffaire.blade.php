@@ -50,9 +50,10 @@
                 datasets: [{
                     label: 'Chiffre d\'affaire',
                     data: data,
-                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
                     borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
+                    borderWidth: 1,
+                    fill: true,
                 }]
             },
             options: {
@@ -65,7 +66,7 @@
                             text: 'Chiffre d\'affaire'
                         },
                         ticks: {
-                            stepSize: 10000000,
+                            stepSize: 1000000,
                             precision: 0
                         }
                     },
@@ -80,7 +81,7 @@
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return `Réservations: ${context.raw}`;
+                                return `Montant: ${context.raw}`;
                             }
                         }
                     }
