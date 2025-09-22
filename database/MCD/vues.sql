@@ -24,19 +24,6 @@ LEFT JOIN mode_paiement mp
 GROUP BY r.id, r.reference;
 
 
-CREATE OR REPLACE VIEW vue_repartition_mensuelle_reservations AS
-SELECT 
-    YEAR(date_premier_jour) AS annee,
-    LPAD(MONTH(date_premier_jour), 2, '0') AS mois,
-    COUNT(*) AS nombre_reservations
-FROM 
-    reservations
-GROUP BY 
-    YEAR(date_premier_jour),
-    LPAD(MONTH(date_premier_jour), 2, '0')
-ORDER BY 
-    annee, mois;
-
 CREATE OR REPLACE VIEW vue_etat_paiement AS
 SELECT
     r.id,
@@ -73,6 +60,21 @@ LEFT JOIN (
 ) f 
 ON r.id = f.id_reservation 
 AND r.reference = f.reference_reservation;
+
+
+CREATE OR REPLACE VIEW vue_repartition_mensuelle_reservations AS
+SELECT 
+    YEAR(r.date_premier_jour) AS annee,
+    LPAD(MONTH(r.date_premier_jour), 2, '0') AS mois,
+    COUNT(DISTINCT r.id) AS nombre_reservations
+FROM reservations r
+JOIN facture f ON f.id_reservation = r.id
+JOIN recus rc ON rc.id_facture = f.id
+GROUP BY 
+    YEAR(r.date_premier_jour),
+    LPAD(MONTH(r.date_premier_jour), 2, '0')
+ORDER BY 
+    annee, mois;
 
 
 CREATE OR REPLACE VIEW vue_chiffre_affaire_mensuel AS
