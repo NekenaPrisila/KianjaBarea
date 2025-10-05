@@ -58,6 +58,17 @@ class ReservationController extends Controller
             $query->where('id_client', $clientId);
         }
 
+        // Filtrer par date du premier jour si fourni (format YYYY-MM-DD)
+        $datePremierJour = request()->query('date_premier_jour');
+        if ($datePremierJour !== null && $datePremierJour !== '') {
+            try {
+                $date = Carbon::parse($datePremierJour)->toDateString();
+                $query->whereDate('date_premier_jour', $date);
+            } catch (\Exception $e) {
+                // Si la date n'est pas valide, ignorer le filtre
+            }
+        }
+
         $reservations = $query->get();
 
         return view('reservations.index', compact('reservations'));

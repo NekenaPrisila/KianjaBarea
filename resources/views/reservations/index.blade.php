@@ -49,6 +49,13 @@
                 </div>
 
                 <div class="row mb-3">
+                    <label for="date_premier_jour" class="col-sm-2 col-form-label">Date du premier jour</label>
+                    <div class="col-sm-10">
+                        <input type="date" class="form-control" id="date_premier_jour" name="date_premier_jour" value="{{ request('date_premier_jour') }}">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
                     <label class="col-sm-2 col-form-label">Filtrer</label>
                     <div class="col-sm-10">
                         <button type="submit" class="btn btn-primary">Rechercher</button>
